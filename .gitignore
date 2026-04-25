@@ -16,3 +16,20 @@ venv/
 
 # Pokud jsou ty tisíce souborů v nějaké jiné složce (např. cache), přidej ji sem:
 cache/
+
+# Municipal MVP raw downloaded data
+municipal_map_mvp/data/raw/*.csv
+municipal_map_mvp/data/raw/*.zip
+municipal_map_mvp/data/raw/*.json
+
+# Large geodata
+municipal_map_mvp/data/geo/*.geojson
+municipal_map_mvp/data/geo/*.shp
+municipal_map_mvp/data/geo/*.dbf
+municipal_map_mvp/data/geo/*.shx
+municipal_map_mvp/data/geo/*.prj
+
+# Local generated files
+.DS_Store
+__pycache__/
+*.pyc
