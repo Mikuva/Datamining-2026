@@ -1,0 +1,18 @@
+# Ignorovat systémový a Python balast
+__pycache__/
+*.pyc
+*.pdf
+*.zip
+.ipynb_checkpoints/
+.venv/
+venv/
+.DS_Store
+
+# Ignorovat ty "napiču" složky v outputs, jak jsme chtěli
+**/czso_ikz_a_to_z_output/_downloads/
+**/czso_ikz_a_to_z_output/_excluded_historical/
+**/czso_ikz_a_to_z_output/_excluded_no_preview/
+**/czso_ikz_a_to_z_output/previews/
+
+# Pokud jsou ty tisíce souborů v nějaké jiné složce (např. cache), přidej ji sem:
+cache/

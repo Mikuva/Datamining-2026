@@ -1,0 +1,13 @@
+name: czso-ikz-v10
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pandas>=2.1
+  - requests>=2.31
+  - openpyxl>=3.1
+  - ipykernel
+  - jupyterlab
+  - nbformat
+  - charset-normalizer
