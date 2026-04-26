@@ -1,0 +1,1150 @@
+"idhod","hodnota","stapro_kod","ekakocd_cis","ekakocd_kod","pvdom_cis","pvdom_kod","rok","uzemi_cis","uzemi_kod","stapro_txt","ekakocd_txt","pvdom_txt"
+"1433379011","144597","6010",,,,,"2010","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433369055","150246","6010","221","6",,,"2010","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433371722","161300","6010","221","5",,,"2010","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433381169","15703","6010","220","14","213","14","2010","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381144","78411","6010",,,"213","14","2010","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381211","11721","6010","221","11","213","14","2010","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369636","85547","6010","221","11",,,"2010","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433379346","76906","6010","221","4",,,"2010","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433377328","134556","6010","220","14",,,"2010","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433388355","31404","6010","221","5","213","14","2010","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386723","30718","6010","221","4","213","14","2010","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433392148","122525","6010","221","6","213","14","2010","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433379013","147456","6010",,,,,"2011","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433369057","154103","6010","221","6",,,"2011","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433371724","157303","6010","221","5",,,"2011","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433373490","139316","6010","220","14",,,"2011","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433381170","13809","6010","220","14","213","14","2011","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381145","79863","6010",,,"213","14","2011","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381212","14889","6010","221","11","213","14","2011","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384312","127238","6010","221","6","213","14","2011","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433367917","80638","6010","221","4",,,"2011","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433369638","87702","6010","221","11",,,"2011","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433388356","31216","6010","221","5","213","14","2011","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386724","32074","6010","221","4","213","14","2011","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433379015","149737","6010",,,,,"2012","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433371726","162393","6010","221","5",,,"2012","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433378000","141567","6010","220","14",,,"2012","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433381171","14097","6010","220","14","213","14","2012","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381146","81197","6010",,,"213","14","2012","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381213","14211","6010","221","11","213","14","2012","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384313","128396","6010","221","6","213","14","2012","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370584","155530","6010","221","6",,,"2012","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433386611","25660","6010","221","4","213","14","2012","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370384","102926","6010","221","11",,,"2012","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433369439","73583","6010","221","4",,,"2012","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433388357","34474","6010","221","5","213","14","2012","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433379017","153269","6010",,,,,"2013","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433381172","14455","6010","220","14","213","14","2013","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433379689","161089","6010","221","6",,,"2013","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433381214","10115","6010","221","11","213","14","2013","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384314","134228","6010","221","6","213","14","2013","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368712","74692","6010","221","4",,,"2013","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433386612","25422","6010","221","4","213","14","2013","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370386","97329","6010","221","11",,,"2013","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433388358","34339","6010","221","5","213","14","2013","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381106","83574","6010",,,"213","14","2013","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433376325","170328","6010","221","5",,,"2013","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433373516","142779","6010","220","14",,,"2013","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433381173","15485","6010","220","14","213","14","2014","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433379691","166405","6010","221","6",,,"2014","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433381215","12803","6010","221","11","213","14","2014","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368714","76655","6010","221","4",,,"2014","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433386613","22116","6010","221","4","213","14","2014","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370388","103733","6010","221","11",,,"2014","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433373726","157623","6010",,,,,"2014","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433388359","35309","6010","221","5","213","14","2014","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384315","139729","6010","221","6","213","14","2014","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433376327","172452","6010","221","5",,,"2014","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433381107","87205","6010",,,"213","14","2014","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433373518","145911","6010","220","14",,,"2014","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433375265","164852","6010",,,,,"2015","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433379693","172988","6010","221","6",,,"2015","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433389068","38575","6010","221","5","213","14","2015","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369662","102838","6010","221","11",,,"2015","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433386614","19955","6010","221","4","213","14","2015","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384217","14596","6010","220","14","213","14","2015","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384254","12650","6010","221","11","213","14","2015","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370213","78562","6010","221","4",,,"2015","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433377384","150497","6010","220","14",,,"2015","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433384316","145309","6010","221","6","213","14","2015","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433376329","185846","6010","221","5",,,"2015","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433381108","90988","6010",,,"213","14","2015","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433375267","172173","6010",,,,,"2016","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433378021","154511","6010","220","14",,,"2016","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433379695","179756","6010","221","6",,,"2016","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433387558","15242","6010","220","14","213","14","2016","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391914","27006","6010","221","4","213","14","2016","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388238","7551","6010","221","11","213","14","2016","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390600","151194","6010","221","6","213","14","2016","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369664","112308","6010","221","11",,,"2016","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433384249","43219","6010","221","5","213","14","2016","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368687","193972","6010","221","5",,,"2016","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433370215","84505","6010","221","4",,,"2016","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433381109","96474","6010",,,"213","14","2016","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433378953","203301","6010","221","6",,,"2018","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433373544","168935","6010","220","14",,,"2018","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433369902","195071","6010",,,,,"2018","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433388271","18094","6010","220","14","213","14","2018","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391916","35377","6010","221","4","213","14","2018","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388240","19673","6010","221","11","213","14","2018","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390602","173130","6010","221","6","213","14","2018","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384251","47722","6010","221","5","213","14","2018","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370219","101647","6010","221","4",,,"2018","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433371134","115723","6010","221","11",,,"2018","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433370188","222208","6010","221","5",,,"2018","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433382645","112107","6010",,,"213","14","2018","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433378955","218961","6010","221","6",,,"2019","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433390603","185703","6010","221","6","213","14","2019","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388272","19276","6010","220","14","213","14","2019","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368933","120322","6010","221","11",,,"2019","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433370652","209754","6010",,,,,"2019","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433391917","30475","6010","221","4","213","14","2019","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388241","22512","6010","221","11","213","14","2019","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384252","51132","6010","221","5","213","14","2019","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370190","237132","6010","221","5",,,"2019","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433382646","120555","6010",,,"213","14","2019","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370985","93353","6010","221","4",,,"2019","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433373550","182065","6010","220","14",,,"2019","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433378023","161033","6010","220","14",,,"2017","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433378951","191391","6010","221","6",,,"2017","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433375269","182443","6010",,,,,"2017","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433388270","16835","6010","220","14","213","14","2017","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391915","32312","6010","221","4","213","14","2017","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388239","13383","6010","221","11","213","14","2017","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390601","161302","6010","221","6","213","14","2017","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369666","102704","6010","221","11",,,"2017","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433384250","44990","6010","221","5","213","14","2017","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368689","203314","6010","221","5",,,"2017","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433370217","92308","6010","221","4",,,"2017","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433381110","103848","6010",,,"213","14","2017","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388273","21117","6010","220","14","213","14","2020","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390651","26137","6010","221","4","213","14","2020","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370654","220106","6010",,,,,"2020","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433391911","192297","6010","221","6","213","14","2020","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369676","117201","6010","221","11",,,"2020","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433375959","227469","6010","221","6",,,"2020","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433388242","17710","6010","221","11","213","14","2020","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384253","53520","6010","221","5","213","14","2020","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433375554","252238","6010","221","5",,,"2020","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433382647","123346","6010",,,"213","14","2020","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433370987","97434","6010","221","4",,,"2020","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433372781","199219","6010","220","14",,,"2020","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433388274","21921","6010","220","14","213","14","2021","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390652","42866","6010","221","4","213","14","2021","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387319","139482","6010",,,"213","14","2021","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387324","57136","6010","221","5","213","14","2021","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433367994","111625","6010","221","4",,,"2021","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433391912","217847","6010","221","6","213","14","2021","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369678","119814","6010","221","11",,,"2021","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433388243","17916","6010","221","11","213","14","2021","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433371423","241160","6010",,,,,"2021","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433376708","256235","6010","221","6",,,"2021","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433375556","263794","6010","221","5",,,"2021","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433372783","208666","6010","220","14",,,"2021","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1441283496","278673","6010",,,,,"2023","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1441283497","154702","6010",,,"213","14","2023","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1441283498","286954","6010","221","6",,,"2023","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1441283499","235015","6010","221","6","213","14","2023","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1441283528","310594","6010","221","5",,,"2023","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1441283529","50086","6010","221","5","213","14","2023","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1441283530","257882","6010","220","14",,,"2023","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1441283531","11402","6010","220","14","213","14","2023","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1441283532","101614","6010","221","4",,,"2023","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1441283533","14398","6010","221","4","213","14","2023","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1441283534","127828","6010","221","11",,,"2023","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1441283535","3496","6010","221","11","213","14","2023","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433369892","259850","6010",,,,,"2022","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem",
+"1433388285","7090","6010","220","14","213","14","2022","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390653","19897","6010","221","4","213","14","2022","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433373385","111428","6010","221","11",,,"2022","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti",
+"1433387320","147936","6010",,,"213","14","2022","97","19","Průměrné čisté peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387325","46815","6010","221","5","213","14","2022","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391913","223473","6010","221","6","213","14","2022","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388254","4364","6010","221","11","213","14","2022","97","19","Průměrné čisté peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433376710","269316","6010","221","6",,,"2022","97","19","Průměrné čisté peněžní příjmy domácností","Zaměstnanci",
+"1433375558","303901","6010","221","5",,,"2022","97","19","Průměrné čisté peněžní příjmy domácností","Samostatně činní",
+"1433375577","97437","6010","221","4",,,"2022","97","19","Průměrné čisté peněžní příjmy domácností","Nezaměstnaní",
+"1433372809","224161","6010","220","14",,,"2022","97","19","Průměrné čisté peněžní příjmy domácností","Důchodci",
+"1433386255","12436","6008",,,"214","12","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433384749","10823","6008",,,"214","13","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433381188","14164","6008","221","11","213","14","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433385612","2228","6008","220","14","214","12","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433377875","89633","6008","221","11",,,"2010","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433379706","182316","6008","221","6",,,"2010","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433391920","19435","6008","220","14","213","14","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433389504","16864","6008","221","6","214","13","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433373249","183740","6008","221","5",,,"2010","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433385573","4425","6008","221","5","214","13","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433385758","426","6008",,,"213","19","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433390170","15700","6008","221","6","214","12","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433383375","2487","6008","221","11","214","12","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433383154","3711","6008","221","4","214","12","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433387473","153314","6008","221","6","213","14","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386347","1858","6008","221","11","214","13","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433369453","84503","6008","221","4",,,"2010","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433384880","764","6008","221","5","213","19","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433385965","98000","6008",,,"213","14","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433380084","18779","6008","221","5","214","12","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433391822","4225","6008","221","4","214","13","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433379041","167429","6008",,,,,"2010","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433381087","495","6008","221","6","213","19","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433385673","339","6008","221","4","213","19","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433382429","2210","6008","220","14","214","13","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433386727","39159","6008","221","5","213","14","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433383486","52","6008","220","14","213","19","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433383492","259","6008","221","11","213","19","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433384318","37508","6008","221","4","213","14","2010","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433373524","138942","6008","220","14",,,"2010","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433373526","143023","6008","220","14",,,"2011","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433387363","39066","6008","221","5","213","14","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386257","12733","6008",,,"214","12","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433381189","18013","6008","221","11","213","14","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391045","1948","6008","220","14","214","13","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433391243","100330","6008",,,"213","14","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433379754","170872","6008",,,,,"2011","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433377828","178672","6008","221","5",,,"2011","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433387514","444","6008","221","11","213","19","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433379708","188144","6008","221","6",,,"2011","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433389507","17647","6008","221","6","214","13","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433378612","91287","6008","221","11",,,"2011","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433385760","422","6008",,,"213","19","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433387474","160152","6008","221","6","213","14","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391010","11106","6008",,,"214","13","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433382028","17023","6008","220","14","213","14","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386350","2166","6008","221","11","214","13","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433391845","1799","6008","220","14","214","12","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433387211","17770","6008","221","5","214","12","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433386773","893","6008","221","5","213","19","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433384376","38810","6008","221","4","213","14","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433390934","16851","6008","221","6","214","12","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433383349","271","6008","221","4","213","19","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433380073","2948","6008","221","4","214","12","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433370196","87617","6008","221","4",,,"2011","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433391825","4302","6008","221","4","214","13","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433381562","1863","6008","221","11","214","12","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433387173","4493","6008","221","5","214","13","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433381089","457","6008","221","6","213","19","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433386763","40","6008","220","14","213","19","2011","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433387364","42926","6008","221","5","213","14","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384784","3324","6008","221","4","214","13","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433381190","16179","6008","221","11","213","14","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391048","4843","6008","221","5","214","13","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433387516","604","6008","221","11","213","19","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433387521","1059","6008","221","5","213","19","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433378614","107756","6008","221","11",,,"2012","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433391700","16217","6008","221","6","214","12","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433385762","507","6008",,,"213","19","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433387056","12361","6008",,,"214","12","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433376732","188919","6008","221","6",,,"2012","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433378596","183603","6008","221","5",,,"2012","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433383351","468","6008","221","4","213","19","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433383147","3611","6008","221","11","214","12","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433387475","160586","6008","221","6","213","14","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391012","11211","6008",,,"214","13","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433382029","17419","6008","220","14","213","14","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387509","61","6008","220","14","213","19","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433391848","1938","6008","220","14","214","12","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433387214","17427","6008","221","5","214","12","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433384377","30260","6008","221","4","213","14","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368390","172802","6008",,,,,"2012","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433380056","1970","6008","220","14","214","13","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433380076","2011","6008","221","4","214","12","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433370198","78451","6008","221","4",,,"2012","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433383948","17710","6008","221","6","214","13","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433377375","145414","6008","220","14",,,"2012","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433382628","539","6008","221","6","213","19","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433382655","101388","6008",,,"213","14","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433380039","1824","6008","221","11","214","13","2012","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433387365","42647","6008","221","5","213","14","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433384771","17589","6008","221","6","214","12","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433387117","2922","6008","221","11","214","12","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433381191","12313","6008","221","11","213","14","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368098","101458","6008","221","11",,,"2013","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433385607","1651","6008","221","4","214","12","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433367972","79151","6008","221","4",,,"2013","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433383223","4810","6008","221","5","214","13","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433387518","205","6008","221","11","213","19","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433387543","1018","6008","221","5","213","19","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433385764","473","6008",,,"213","19","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433376734","196568","6008","221","6",,,"2013","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433378598","193432","6008","221","5",,,"2013","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433380861","2012","6008","220","14","214","13","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433387476","168475","6008","221","6","213","14","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391014","11459","6008",,,"214","13","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433382030","17766","6008","220","14","213","14","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386354","13174","6008",,,"214","12","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433384018","1962","6008","220","14","214","12","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433387511","96","6008","220","14","213","19","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433391851","19312","6008","221","5","214","12","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433386364","3360","6008","221","4","214","13","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433384895","552","6008","221","4","213","19","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433384378","29481","6008","221","4","213","14","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368392","177430","6008",,,,,"2013","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433380042","1412","6008","221","11","214","13","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433383951","18373","6008","221","6","214","13","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433377377","146657","6008","220","14",,,"2013","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433382630","484","6008","221","6","213","19","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433382656","104617","6008",,,"213","14","2013","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387366","43796","6008","221","5","213","14","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433381936","14633","6008","221","11","213","14","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391770","12109","6008",,,"214","13","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433390227","19435","6008","221","6","214","13","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433387303","440","6008","221","6","213","19","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433383226","4869","6008","221","5","214","13","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433387523","73","6008","220","14","213","19","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433387529","462","6008","221","11","213","19","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433387545","915","6008","221","5","213","19","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433380909","20382","6008","221","5","214","12","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433378684","150003","6008","220","14",,,"2014","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433385564","2145","6008","220","14","214","13","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433376736","204451","6008","221","6",,,"2014","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433386403","2042","6008","221","4","214","12","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433385783","426","6008",,,"213","19","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433387929","3239","6008","221","11","214","12","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433368744","81083","6008","221","4",,,"2014","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433387477","176452","6008","221","6","213","14","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433382031","19084","6008","220","14","213","14","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433386351","19051","6008","221","6","214","12","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433386356","14230","6008",,,"214","12","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433386367","2842","6008","221","4","214","13","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433379324","196787","6008","221","5",,,"2014","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433384897","456","6008","221","4","213","19","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433384379","26072","6008","221","4","213","14","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433368394","183536","6008",,,,,"2014","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433380017","1723","6008","221","11","214","13","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433384807","2019","6008","220","14","214","12","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433382657","109788","6008",,,"213","14","2014","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433371869","108233","6008","221","11",,,"2014","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433371727","213422","6008","221","5",,,"2015","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433372590","109489","6008","221","11",,,"2015","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433391037","20302","6008","221","6","214","12","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433369886","192575","6008",,,,,"2015","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433387305","471","6008","221","6","213","19","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433380912","23076","6008","221","5","214","12","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433378686","154549","6008","220","14",,,"2015","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433384737","12685","6008",,,"214","13","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433385549","1916","6008","221","11","214","13","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433385567","5407","6008","221","5","214","13","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433376738","213075","6008","221","6",,,"2015","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433380400","906","6008","221","5","213","19","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433385594","2067","6008","220","14","214","12","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433386406","2316","6008","221","4","214","12","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433385785","433","6008",,,"213","19","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433386618","48143","6008","221","5","213","14","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387478","183958","6008","221","6","213","14","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433391028","2046","6008","220","14","214","13","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433384232","16167","6008","221","11","213","14","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433389657","61","6008","220","14","213","19","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433389664","74","6008","221","11","213","19","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433369472","83124","6008","221","4",,,"2015","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433384380","23584","6008","221","4","213","14","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433380049","2620","6008","221","4","214","13","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433390230","20255","6008","221","6","214","13","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433381805","373","6008","221","4","213","19","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433382658","114898","6008",,,"213","14","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433387160","15470","6008",,,"214","12","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433390658","18009","6008","220","14","213","14","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Příjmy ze závislé činnosti (hlavní zaměstnání)"
+"1433388725","4810","6008","221","11","214","12","2015","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433371729","223939","6008","221","5",,,"2016","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433369888","202102","6008",,,,,"2016","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433382594","253","6008","221","4","213","19","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433374197","159064","6008","220","14",,,"2016","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433382347","4170","6008","221","11","214","12","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433387989","16816","6008",,,"214","12","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433373363","117353","6008","221","11",,,"2016","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433388883","436","6008","221","6","213","19","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433380901","3155","6008","221","4","214","12","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433380402","876","6008","221","5","213","19","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433385787","401","6008",,,"213","19","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433390996","21218","6008","221","6","214","13","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433385519","13514","6008",,,"214","13","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433389659","40","6008","220","14","213","19","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433389666","179","6008","221","11","213","19","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433382460","2424","6008","220","14","214","12","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433370233","91083","6008","221","4",,,"2016","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433380052","3675","6008","221","4","214","13","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433391796","21711","6008","221","6","214","12","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433391805","2169","6008","220","14","214","13","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433387148","1054","6008","221","11","214","13","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433387168","5883","6008","221","5","214","13","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433369078","222250","6008","221","6",,,"2016","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433388027","24961","6008","221","5","214","12","2016","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433384761","2622","6008","220","14","214","13","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433381181","118","6008","221","11","213","19","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433372481","258738","6008","221","5",,,"2018","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433380905","4218","6008","221","4","214","12","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433370647","232045","6008",,,,,"2018","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433380423","62","6008","220","14","213","19","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433380851","21348","6008",,,"214","12","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433387900","27365","6008","221","6","214","12","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433383142","3210","6008","221","11","214","12","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433388803","30313","6008","221","5","214","12","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433385523","15943","6008",,,"214","13","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433386371","4868","6008","221","4","214","13","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433369486","110347","6008","221","4",,,"2018","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433382464","3240","6008","220","14","214","12","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433388074","386","6008","221","4","213","19","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433383960","24583","6008","221","6","214","13","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433389600","331","6008","221","6","213","19","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433377288","174735","6008","220","14",,,"2018","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433380021","2844","6008","221","11","214","13","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433376406","121659","6008","221","11",,,"2018","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433380035","6875","6008","221","5","214","13","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433383465","658","6008","221","5","213","19","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433369082","254918","6008","221","6",,,"2018","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433386768","318","6008",,,"213","19","2018","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433378977","276480","6008","221","6",,,"2019","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433384763","2789","6008","220","14","214","13","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433381183","259","6008","221","11","213","19","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433387535","272","6008",,,"213","19","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433377878","127509","6008","221","11",,,"2019","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433388680","31267","6008","221","6","214","12","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433380425","44","6008","220","14","213","19","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433378577","278026","6008","221","5",,,"2019","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433380853","24287","6008",,,"214","12","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433387924","4209","6008","221","11","214","12","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433390997","17245","6008",,,"214","13","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433374797","99698","6008","221","4",,,"2019","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433381599","7458","6008","221","5","214","13","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433386373","4197","6008","221","4","214","13","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433386383","2842","6008","221","4","214","12","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433386390","34042","6008","221","5","214","12","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433388076","694","6008","221","4","213","19","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433378293","251012","6008",,,,,"2019","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433383962","26516","6008","221","6","214","13","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433389602","264","6008","221","6","213","19","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433372801","188338","6008","220","14",,,"2019","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433380023","3236","6008","221","11","214","13","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433383467","606","6008","221","5","213","19","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433385696","3528","6008","220","14","214","12","2019","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433369890","215669","6008",,,,,"2017","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433384759","2421","6008","220","14","214","13","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433384791","4282","6008","221","4","214","13","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433382596","393","6008","221","4","213","19","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433372479","235250","6008","221","5",,,"2017","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433374199","166369","6008","220","14",,,"2017","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433383444","864","6008","221","5","213","19","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433373365","107863","6008","221","11",,,"2017","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433380903","3064","6008","221","4","214","12","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433381159","214","6008","221","11","213","19","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433380403","38","6008","220","14","213","19","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433380849","18892","6008",,,"214","12","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433385789","375","6008",,,"213","19","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433383140","3626","6008","221","11","214","12","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433388801","26431","6008","221","5","214","12","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433385521","14709","6008",,,"214","13","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433382462","2953","6008","220","14","214","12","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433380044","24557","6008","221","6","214","12","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433383958","22849","6008","221","6","214","13","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433391793","1748","6008","221","11","214","13","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433389598","386","6008","221","6","213","19","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433380033","6369","6008","221","5","214","13","2017","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433370975","99261","6008","221","4",,,"2017","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433369080","238410","6008","221","6",,,"2017","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433381185","163","6008","221","11","213","19","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433387537","244","6008",,,"213","19","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433377880","122913","6008","221","11",,,"2020","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433380427","48","6008","220","14","213","19","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433380432","551","6008","221","5","213","19","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433378579","297573","6008","221","5",,,"2020","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433387926","3360","6008","221","11","214","12","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433390999","17677","6008",,,"214","13","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433374799","104388","6008","221","4",,,"2020","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433380259","98","6008","221","4","213","19","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433380827","25740","6008",,,"214","12","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433381601","7939","6008","221","5","214","13","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433389438","33081","6008","221","6","214","12","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433386375","3721","6008","221","4","214","13","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433386385","3331","6008","221","4","214","12","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433386392","37946","6008","221","5","214","12","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433381608","2515","6008","221","11","214","13","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433378295","263279","6008",,,,,"2020","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433368333","287768","6008","221","6",,,"2020","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433386340","3067","6008","220","14","214","13","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433372803","206205","6008","220","14",,,"2020","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433390241","27469","6008","221","6","214","13","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433382615","251","6008","221","6","213","19","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433385698","3968","6008","220","14","214","12","2020","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433373443","213966","6008","220","14",,,"2021","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433391757","18645","6008",,,"214","13","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433381537","21275","6008","221","6","214","12","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433387539","554","6008",,,"213","19","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433388873","687","6008","221","6","213","19","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433377882","125081","6008","221","11",,,"2021","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433385588","2461","6008","221","11","214","13","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433380434","738","6008","221","5","213","19","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433378581","304180","6008","221","5",,,"2021","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433391829","5765","6008","221","4","214","13","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433384227","226","6008","221","11","213","19","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433374801","119614","6008","221","4",,,"2021","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433380261","823","6008","221","4","213","19","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433389441","18078","6008",,,"214","12","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433386387","3047","6008","221","4","214","12","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433387197","33333","6008","221","5","214","12","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433389463","3032","6008","221","11","214","12","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433378297","277329","6008",,,,,"2021","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433368335","305888","6008","221","6",,,"2021","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433391787","2956","6008","220","14","214","13","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433386342","7791","6008","221","5","214","13","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433390243","29064","6008","221","6","214","13","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433383470","103","6008","220","14","213","19","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433385700","2446","6008","220","14","214","12","2021","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1441283380","2208","6008","221","4","214","13","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1441283381","1962","6008","221","4","214","12","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1441283382","213","6008","221","4","213","19","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1441283383","129746","6008","221","11",,,"2023","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1441283384","543","6008","221","11","214","13","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1441283385","1376","6008","221","11","214","12","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1441283328","319822","6008",,,,,"2023","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1441283329","20740","6008",,,"214","13","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1441283330","20913","6008",,,"214","12","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1441283331","505","6008",,,"213","19","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1441283332","341350","6008","221","6",,,"2023","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1441283333","31468","6008","221","6","214","13","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1441283334","23631","6008","221","6","214","12","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1441283335","703","6008","221","6","213","19","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1441283371","358853","6008","221","5",,,"2023","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1441283372","6768","6008","221","5","214","13","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1441283373","41867","6008","221","5","214","12","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1441283374","376","6008","221","5","213","19","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1441283375","260682","6008","220","14",,,"2023","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1441283376","1580","6008","220","14","214","13","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1441283377","1284","6008","220","14","214","12","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1441283378","64","6008","220","14","213","19","2023","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1441283379","105570","6008","221","4",,,"2023","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433369060","319229","6008","221","6",,,"2022","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci",
+"1433391759","19749","6008",,,"214","13","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Zdravotní a sociální pojištění"
+"1433390179","19059","6008",,,"214","12","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Daň z příjmů fyzických osob"
+"1433379756","298077","6008",,,,,"2022","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem",
+"1433391071","2462","6008","221","4","214","12","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Daň z příjmů fyzických osob"
+"1433388875","790","6008","221","6","213","19","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Bonus daňového zvýhodnění na děti"
+"1433384925","293","6008","221","11","213","19","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Bonus daňového zvýhodnění na děti"
+"1433367875","350875","6008","221","5",,,"2022","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní",
+"1433380395","581","6008",,,"213","19","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Domácnosti celkem","Bonus daňového zvýhodnění na děti"
+"1433385590","659","6008","221","11","214","13","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Zdravotní a sociální pojištění"
+"1433380448","27","6008","220","14","213","19","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Bonus daňového zvýhodnění na děti"
+"1433381823","928","6008","220","14","214","12","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Daň z příjmů fyzických osob"
+"1433379342","102600","6008","221","4",,,"2022","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní",
+"1433385704","86","6008","221","4","213","19","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Bonus daňového zvýhodnění na děti"
+"1433380060","2787","6008","221","4","214","13","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Nezaměstnaní","Zdravotní a sociální pojištění"
+"1433391789","960","6008","220","14","214","13","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci","Zdravotní a sociální pojištění"
+"1433387146","6725","6008","221","5","214","13","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Zdravotní a sociální pojištění"
+"1433381539","20987","6008","221","6","214","12","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Daň z příjmů fyzických osob"
+"1433381568","1227","6008","221","11","214","12","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti","Daň z příjmů fyzických osob"
+"1433390245","29716","6008","221","6","214","13","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Zaměstnanci","Zdravotní a sociální pojištění"
+"1433377324","226022","6008","220","14",,,"2022","97","19","Průměrné hrubé peněžní příjmy domácností","Důchodci",
+"1433383489","550","6008","221","5","213","19","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Bonus daňového zvýhodnění na děti"
+"1433368184","113021","6008","221","11",,,"2022","97","19","Průměrné hrubé peněžní příjmy domácností","Ostatní domácnosti",
+"1433385702","40799","6008","221","5","214","12","2022","97","19","Průměrné hrubé peněžní příjmy domácností","Samostatně činní","Daň z příjmů fyzických osob"
+"1433377064","164332","6016","221","5",,,"2010","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433368733","78994","6016","221","4",,,"2010","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433374055","136742","6016","220","14",,,"2010","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433377542","157154","6016","221","6",,,"2010","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433371144","88917","6016","221","11",,,"2010","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433378271","149564","6016",,,,,"2010","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433374056","141743","6016","220","14",,,"2011","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433374072","160343","6016","221","5",,,"2011","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433369455","83188","6016","221","4",,,"2011","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433371145","90185","6016","221","11",,,"2011","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433378308","161212","6016","221","6",,,"2011","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433378272","152567","6016",,,,,"2011","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433376048","162529","6016","221","6",,,"2012","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433374057","144235","6016","220","14",,,"2012","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433374073","166070","6016","221","5",,,"2012","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433369456","75995","6016","221","4",,,"2012","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433371146","105798","6016","221","11",,,"2012","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433378273","154962","6016",,,,,"2012","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433376049","168433","6016","221","6",,,"2013","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433374058","145551","6016","220","14",,,"2013","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433374074","174048","6016","221","5",,,"2013","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433369457","77107","6016","221","4",,,"2013","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433371147","100506","6016","221","11",,,"2013","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433378274","158678","6016",,,,,"2013","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433380979","284","6016","221","6","213","40","2014","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433384962","457","6016","220","14","213","40","2014","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433368919","106182","6016","221","11",,,"2014","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433376050","173875","6016","221","6",,,"2014","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433384639","3231","6016",,,"214","16","2014","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433380379","153","6016","221","4","213","40","2014","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433385527","3785","6016","220","14","214","16","2014","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433389457","3873","6016","221","5","214","16","2014","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433369458","78952","6016","221","4",,,"2014","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433374827","148674","6016","220","14",,,"2014","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433374838","175814","6016","221","5",,,"2014","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433381754","345","6016",,,"213","40","2014","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433389623","458","6016","221","5","213","40","2014","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433378275","163045","6016",,,,,"2014","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433382392","701","6016","221","11","214","16","2014","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433390890","3001","6016","221","6","214","16","2014","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433391124","197","6016","221","11","213","40","2014","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433388716","1565","6016","221","4","214","16","2014","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433384963","477","6016","220","14","213","40","2015","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433380997","458","6016","221","5","213","40","2015","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433381745","292","6016","221","6","213","40","2015","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433368920","104865","6016","221","11",,,"2015","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433376051","180697","6016","221","6",,,"2015","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433381126","185","6016","221","4","213","40","2015","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433384640","3429","6016",,,"214","16","2015","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433385528","3978","6016","220","14","214","16","2015","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433389458","4119","6016","221","5","214","16","2015","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433369459","81397","6016","221","4",,,"2015","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433374828","153288","6016","220","14",,,"2015","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433374839","189398","6016","221","5",,,"2015","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433383134","1293","6016","221","4","214","16","2015","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433381755","357","6016",,,"213","40","2015","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433378276","170483","6016",,,,,"2015","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433382393","1694","6016","221","11","214","16","2015","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433390891","3199","6016","221","6","214","16","2015","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433391125","265","6016","221","11","213","40","2015","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433384964","472","6016","220","14","213","40","2016","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433380998","455","6016","221","5","213","40","2016","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433387124","3623","6016","221","11","214","16","2016","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433368921","114658","6016","221","11",,,"2016","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433376052","187823","6016","221","6",,,"2016","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433381127","176","6016","221","4","213","40","2016","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433384641","3647","6016",,,"214","16","2016","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433385529","4082","6016","220","14","214","16","2016","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433391866","237","6016","221","11","213","40","2016","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433389459","4782","6016","221","5","214","16","2016","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433369460","87016","6016","221","4",,,"2016","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433374829","157403","6016","220","14",,,"2016","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433374840","197335","6016","221","5",,,"2016","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433383135","1374","6016","221","4","214","16","2016","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433381756","358","6016",,,"213","40","2016","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433381764","296","6016","221","6","213","40","2016","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433378277","178036","6016",,,,,"2016","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433390892","3284","6016","221","6","214","16","2016","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433384966","528","6016","220","14","213","40","2018","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433388733","4549","6016","220","14","214","16","2018","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433381000","475","6016","221","5","213","40","2018","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433387109","1479","6016","221","11","214","16","2018","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433372578","104762","6016","221","4",,,"2018","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433388891","229","6016","221","4","213","40","2018","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433384643","4112","6016",,,"214","16","2018","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433369669","119373","6016","221","11",,,"2018","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433377554","212933","6016","221","6",,,"2018","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433391868","190","6016","221","11","213","40","2018","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433374842","226352","6016","221","5",,,"2018","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433389461","5500","6016","221","5","214","16","2018","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433371183","172189","6016","220","14",,,"2018","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433373715","202125","6016",,,,,"2018","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433383137","1946","6016","221","4","214","16","2018","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433381758","385","6016",,,"213","40","2018","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433381766","310","6016","221","6","213","40","2018","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433390894","3672","6016","221","6","214","16","2018","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433384967","513","6016","220","14","213","40","2019","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433381001","474","6016","221","5","213","40","2019","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433387110","980","6016","221","11","214","16","2019","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433372579","96770","6016","221","4",,,"2019","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433382388","5157","6016","220","14","214","16","2019","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433380375","234","6016","221","11","213","40","2019","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433384644","4366","6016",,,"214","16","2019","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433383138","1362","6016","221","4","214","16","2019","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433377555","229831","6016","221","6",,,"2019","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433370397","124417","6016","221","11",,,"2019","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433380720","5503","6016","221","5","214","16","2019","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433371184","185311","6016","220","14",,,"2019","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433373716","217626","6016",,,,,"2019","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433381759","385","6016",,,"213","40","2019","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433381767","319","6016","221","6","213","40","2019","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433389619","149","6016","221","4","213","40","2019","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433371062","241752","6016","221","5",,,"2019","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433390895","3881","6016","221","6","214","16","2019","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433384965","515","6016","220","14","213","40","2017","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433380999","484","6016","221","5","213","40","2017","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433387108","2456","6016","221","11","214","16","2017","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433372577","94790","6016","221","4",,,"2017","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433376053","200204","6016","221","6",,,"2017","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433388890","251","6016","221","4","213","40","2017","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433384642","4070","6016",,,"214","16","2017","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433369668","104782","6016","221","11",,,"2017","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433385530","4458","6016","220","14","214","16","2017","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433391867","184","6016","221","11","213","40","2017","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433374841","207117","6016","221","5",,,"2017","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433389460","5999","6016","221","5","214","16","2017","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433371182","164054","6016","220","14",,,"2017","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433383136","1381","6016","221","4","214","16","2017","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433381757","377","6016",,,"213","40","2017","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433381765","299","6016","221","6","213","40","2017","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433378278","188860","6016",,,,,"2017","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433390893","3538","6016","221","6","214","16","2017","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433390896","4314","6016","221","6","214","16","2020","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433384968","534","6016","220","14","213","40","2020","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433381002","535","6016","221","5","213","40","2020","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433387111","1081","6016","221","11","214","16","2020","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433373352","100306","6016","221","4",,,"2020","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433382389","5013","6016","220","14","214","16","2020","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433380376","181","6016","221","11","213","40","2020","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433383139","1241","6016","221","4","214","16","2020","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433370398","119986","6016","221","11",,,"2020","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433371185","202596","6016","220","14",,,"2020","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433385442","5525","6016","221","5","214","16","2020","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433373717","228122","6016",,,,,"2020","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433381760","407","6016",,,"213","40","2020","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433381768","334","6016","221","6","213","40","2020","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433389620","144","6016","221","4","213","40","2020","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433386324","4559","6016",,,"214","16","2020","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433374520","238631","6016","221","6",,,"2020","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433371063","257163","6016","221","5",,,"2020","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433387112","813","6016","221","11","214","16","2021","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433373353","114177","6016","221","4",,,"2021","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433382390","6143","6016","220","14","214","16","2021","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433384704","1769","6016","221","4","214","16","2021","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433382535","501","6016","221","5","213","40","2021","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433384637","4590","6016","221","6","214","16","2021","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433380377","243","6016","221","11","213","40","2021","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433370399","123266","6016","221","11",,,"2021","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433380209","423","6016",,,"213","40","2021","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433371186","212393","6016","220","14",,,"2021","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433385443","6335","6016","221","5","214","16","2021","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433373718","249719","6016",,,,,"2021","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433381769","352","6016","221","6","213","40","2021","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433389621","225","6016","221","4","213","40","2021","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433386325","5123","6016",,,"214","16","2021","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433374521","268190","6016","221","6",,,"2021","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433371064","268639","6016","221","5",,,"2021","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433391122","568","6016","220","14","213","40","2021","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1441283127","287842","6016",,,,,"2023","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1441283128","533","6016",,,"213","40","2023","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1441283129","5857","6016",,,"214","16","2023","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1441283130","299372","6016","221","6",,,"2023","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1441283131","448","6016","221","6","213","40","2023","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1441283132","5302","6016","221","6","214","16","2023","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1441283178","315294","6016","221","5",,,"2023","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1441283179","694","6016","221","5","213","40","2023","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1441283180","6489","6016","221","5","214","16","2023","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1441283181","261465","6016","220","14",,,"2023","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1441283182","733","6016","220","14","213","40","2023","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1441283183","7635","6016","220","14","214","16","2023","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1441283184","104441","6016","221","4",,,"2023","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1441283185","175","6016","221","4","213","40","2023","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1441283186","913","6016","221","4","214","16","2023","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1441283187","131003","6016","221","11",,,"2023","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1441283188","141","6016","221","11","213","40","2023","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1441283189","3979","6016","221","11","214","16","2023","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433382558","388","6016","221","6","213","40","2022","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Daň z majetku"
+"1433387113","1237","6016","221","11","214","16","2022","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Vydané peněžní transfery do jiných domácností"
+"1433373354","100585","6016","221","4",,,"2022","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní",
+"1433384638","4631","6016","221","6","214","16","2022","97","19","Průměrné čisté příjmy domácností","Zaměstnanci","Vydané peněžní transfery do jiných domácností"
+"1433380378","92","6016","221","11","213","40","2022","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti","Daň z majetku"
+"1433370400","113403","6016","221","11",,,"2022","97","19","Průměrné čisté příjmy domácností","Ostatní domácnosti",
+"1433385444","7139","6016","221","5","214","16","2022","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Vydané peněžní transfery do jiných domácností"
+"1433373719","269178","6016",,,,,"2022","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem",
+"1433389622","230","6016","221","4","213","40","2022","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Daň z majetku"
+"1433386326","5315","6016",,,"214","16","2022","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Vydané peněžní transfery do jiných domácností"
+"1433374522","281981","6016","221","6",,,"2022","97","19","Průměrné čisté příjmy domácností","Zaměstnanci",
+"1433371065","308695","6016","221","5",,,"2022","97","19","Průměrné čisté příjmy domácností","Samostatně činní",
+"1433382391","6770","6016","220","14","214","16","2022","97","19","Průměrné čisté příjmy domácností","Důchodci","Vydané peněžní transfery do jiných domácností"
+"1433371918","227416","6016","220","14",,,"2022","97","19","Průměrné čisté příjmy domácností","Důchodci",
+"1433381011","634","6016","221","5","213","40","2022","97","19","Průměrné čisté příjmy domácností","Samostatně činní","Daň z majetku"
+"1433381023","465","6016",,,"213","40","2022","97","19","Průměrné čisté příjmy domácností","Domácnosti celkem","Daň z majetku"
+"1433391123","627","6016","220","14","213","40","2022","97","19","Průměrné čisté příjmy domácností","Důchodci","Daň z majetku"
+"1433388714","1012","6016","221","4","214","16","2022","97","19","Průměrné čisté příjmy domácností","Nezaměstnaní","Vydané peněžní transfery do jiných domácností"
+"1433375194","6907","6012","221","6",,,"2010","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433377075","2089","6012","221","4",,,"2010","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433370636","4967","6012",,,,,"2010","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433368666","3031","6012","221","5",,,"2010","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433387418","1660","6012",,,"213","18","2010","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433372812","2186","6012","220","14",,,"2010","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433368226","3370","6012","221","11",,,"2010","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433391324","351","6012","220","14","213","18","2010","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433391329","723","6012","221","4","213","18","2010","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433391956","2548","6012","221","6","213","18","2010","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433392188","129","6012","221","11","213","18","2010","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433392193","785","6012","221","5","213","18","2010","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433377076","2550","6012","221","4",,,"2011","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433370637","5111","6012",,,,,"2011","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433368667","3041","6012","221","5",,,"2011","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433376684","7109","6012","221","6",,,"2011","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433387419","1635","6012",,,"213","18","2011","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433372813","2427","6012","220","14",,,"2011","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433368227","2483","6012","221","11",,,"2011","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433391325","336","6012","220","14","213","18","2011","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433391330","690","6012","221","4","213","18","2011","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433391957","2543","6012","221","6","213","18","2011","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433392189","246","6012","221","11","213","18","2011","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433392194","768","6012","221","5","213","18","2011","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433377077","2411","6012","221","4",,,"2012","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433370638","5225","6012",,,,,"2012","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433368668","3677","6012","221","5",,,"2012","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433376685","6999","6012","221","6",,,"2012","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433387487","2501","6012","221","6","213","18","2012","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433387420","1620","6012",,,"213","18","2012","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433372814","2668","6012","220","14",,,"2012","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433368228","2872","6012","221","11",,,"2012","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433391326","337","6012","220","14","213","18","2012","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433391331","648","6012","221","4","213","18","2012","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433392190","286","6012","221","11","213","18","2012","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433392195","785","6012","221","5","213","18","2012","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433377078","2415","6012","221","4",,,"2013","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433370639","5409","6012",,,,,"2013","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433368669","3720","6012","221","5",,,"2013","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433376686","7344","6012","221","6",,,"2013","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433387488","2634","6012","221","6","213","18","2013","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433387421","1678","6012",,,"213","18","2013","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433372815","2772","6012","220","14",,,"2013","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433368229","3177","6012","221","11",,,"2013","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433391332","682","6012","221","4","213","18","2013","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433391958","358","6012","220","14","213","18","2013","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433392191","220","6012","221","11","213","18","2013","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433392196","749","6012","221","5","213","18","2013","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433388738","3096","6012","221","5","214","17","2014","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433381488","6133","6012","221","6","214","17","2014","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433382583","1337","6012","221","6","213","47","2014","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433387123","2693","6012","220","14","214","17","2014","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433377079","2297","6012","221","4",,,"2014","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433368948","2449","6012","221","11",,,"2014","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433384065","802","6012",,,"213","47","2014","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433383353","266","6012","221","5","213","47","2014","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433376687","7470","6012","221","6",,,"2014","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433380808","2155","6012","221","4","214","17","2014","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433387489","2742","6012","221","6","213","18","2014","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433385067","354","6012","221","11","213","18","2014","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433388057","70","6012","220","14","213","47","2014","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433377533","5422","6012",,,,,"2014","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433387856","4620","6012",,,"214","17","2014","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433383336","108","6012","221","11","213","47","2014","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433387422","1733","6012",,,"213","18","2014","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433386331","2341","6012","221","11","214","17","2014","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433377315","2762","6012","220","14",,,"2014","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433385652","142","6012","221","4","213","47","2014","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433391333","436","6012","221","4","213","18","2014","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433370943","3363","6012","221","5",,,"2014","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433391959","369","6012","220","14","213","18","2014","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433392197","725","6012","221","5","213","18","2014","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433388739","3289","6012","221","5","214","17","2015","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433381489","6515","6012","221","6","214","17","2015","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433382584","1194","6012","221","6","213","47","2015","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433382803","451","6012","221","4","213","18","2015","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433387132","1882","6012","221","11","214","17","2015","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433387954","2730","6012","220","14","214","17","2015","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433384063","144","6012","221","11","213","47","2015","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433384066","728","6012",,,"213","47","2015","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433374847","2791","6012","220","14",,,"2015","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433376688","7709","6012","221","6",,,"2015","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433380809","2610","6012","221","4","214","17","2015","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433387490","2970","6012","221","6","213","18","2015","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433385068","174","6012","221","11","213","18","2015","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433380244","263","6012","221","5","213","47","2015","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433369441","2835","6012","221","4",,,"2015","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433388058","61","6012","220","14","213","47","2015","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433377534","5630","6012",,,,,"2015","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433387857","4902","6012",,,"214","17","2015","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433370373","2027","6012","221","11",,,"2015","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433385653","225","6012","221","4","213","47","2015","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433370944","3553","6012","221","5",,,"2015","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433391960","357","6012","220","14","213","18","2015","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433384346","1873","6012",,,"213","18","2015","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433392198","776","6012","221","5","213","18","2015","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433381490","6807","6012","221","6","214","17","2016","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433382799","366","6012","220","14","213","18","2016","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433382804","376","6012","221","4","213","18","2016","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433387133","2211","6012","221","11","214","17","2016","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433384079","140","6012","221","11","213","47","2016","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433374848","2892","6012","220","14",,,"2016","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433376689","8067","6012","221","6",,,"2016","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433380810","2825","6012","220","14","214","17","2016","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433380816","3170","6012","221","5","214","17","2016","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433387491","3252","6012","221","6","213","18","2016","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433385069","282","6012","221","11","213","18","2016","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433385074","910","6012","221","5","213","18","2016","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433370374","2351","6012","221","11",,,"2016","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433380245","193","6012","221","5","213","47","2016","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433369442","2511","6012","221","4",,,"2016","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433388059","67","6012","220","14","213","47","2016","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433377535","5862","6012",,,,,"2016","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433380178","758","6012",,,"213","47","2016","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433387858","5104","6012",,,"214","17","2016","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433392026","2075","6012",,,"213","18","2016","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433381570","2456","6012","221","4","214","17","2016","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433385654","56","6012","221","4","213","47","2016","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433385687","1259","6012","221","6","213","47","2016","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433370945","3364","6012","221","5",,,"2016","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433379920","6158","6012",,,"214","17","2018","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433384139","1450","6012","221","6","213","47","2018","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433387126","3824","6012","221","5","214","17","2018","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433387135","3649","6012","221","11","214","17","2018","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433382377","2861","6012","221","4","214","17","2018","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433391901","2554","6012",,,"213","18","2018","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433376787","9631","6012","221","6",,,"2018","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433387041","8181","6012","221","6","214","17","2018","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433391233","392","6012","221","11","213","18","2018","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433391238","1093","6012","221","5","213","18","2018","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433380812","3222","6012","220","14","214","17","2018","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433385066","3919","6012","221","6","213","18","2018","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433380221","254","6012","221","4","213","47","2018","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433380247","320","6012","221","5","213","47","2018","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433369444","3115","6012","221","4",,,"2018","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433388061","31","6012","220","14","213","47","2018","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433377537","7053","6012",,,,,"2018","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433380180","895","6012",,,"213","47","2018","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433392003","476","6012","220","14","213","18","2018","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433392008","723","6012","221","4","213","18","2018","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433371118","3649","6012","221","11",,,"2018","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433376362","3253","6012","220","14",,,"2018","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433384835","0","6012","221","11","213","47","2018","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433376331","4144","6012","221","5",,,"2018","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433379921","6844","6012",,,"214","17","2019","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433387381","4701","6012","221","6","213","18","2019","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433384137","50","6012","220","14","213","47","2019","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433384140","1684","6012","221","6","213","47","2019","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433388734","3416","6012","221","4","214","17","2019","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433387127","4333","6012","221","5","214","17","2019","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433387136","4095","6012","221","11","214","17","2019","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433391902","3095","6012",,,"213","18","2019","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433376788","10869","6012","221","6",,,"2019","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433387042","9185","6012","221","6","214","17","2019","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433391234","1276","6012","221","11","213","18","2019","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433391239","1481","6012","221","5","213","18","2019","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433380813","3196","6012","220","14","214","17","2019","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433380248","287","6012","221","5","213","47","2019","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433369445","3416","6012","221","4",,,"2019","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433377538","7873","6012",,,,,"2019","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433380181","1029","6012",,,"213","47","2019","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433392004","518","6012","220","14","213","18","2019","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433392009","783","6012","221","4","213","18","2019","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433371119","4095","6012","221","11",,,"2019","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433376363","3246","6012","220","14",,,"2019","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433384836","0","6012","221","11","213","47","2019","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433376332","4620","6012","221","5",,,"2019","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433383279","0","6012","221","4","213","47","2019","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433379919","5577","6012",,,"214","17","2017","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433384138","1345","6012","221","6","213","47","2017","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433387125","3410","6012","221","5","214","17","2017","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433387134","2079","6012","221","11","214","17","2017","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433372467","3803","6012","221","5",,,"2017","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433384080","0","6012","221","11","213","47","2017","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433391232","323","6012","221","11","213","18","2017","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433376690","8813","6012","221","6",,,"2017","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433391237","1012","6012","221","5","213","18","2017","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433380811","2969","6012","220","14","214","17","2017","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433385065","3593","6012","221","6","213","18","2017","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433370375","2079","6012","221","11",,,"2017","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433380246","393","6012","221","5","213","47","2017","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433369443","2482","6012","221","4",,,"2017","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433388060","52","6012","220","14","213","47","2017","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433377536","6417","6012",,,,,"2017","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433380179","841","6012",,,"213","47","2017","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433392002","413","6012","220","14","213","18","2017","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433392007","694","6012","221","4","213","18","2017","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433392027","2324","6012",,,"213","18","2017","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433376361","3021","6012","220","14",,,"2017","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433381571","2442","6012","221","4","214","17","2017","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433385655","40","6012","221","4","213","47","2017","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433383072","7468","6012","221","6","214","17","2017","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433380987","975","6012",,,"213","47","2020","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433387382","5072","6012","221","6","213","18","2020","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433384141","1621","6012","221","6","213","47","2020","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433388735","2873","6012","221","4","214","17","2020","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433387128","4674","6012","221","5","214","17","2020","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433387967","2785","6012","221","11","214","17","2020","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433367949","2873","6012","221","4",,,"2020","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433391903","3303","6012",,,"213","18","2020","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433376789","11163","6012","221","6",,,"2020","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433391235","760","6012","221","11","213","18","2020","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433391240","1583","6012","221","5","213","18","2020","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433380814","3311","6012","220","14","214","17","2020","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433381807","251","6012","221","5","213","47","2020","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433380722","7041","6012",,,"214","17","2020","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433387853","9542","6012","221","6","214","17","2020","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433383325","66","6012","220","14","213","47","2020","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433392005","579","6012","220","14","213","18","2020","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433392010","1320","6012","221","4","213","18","2020","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433371120","2785","6012","221","11",,,"2020","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433376364","3377","6012","220","14",,,"2020","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433378282","8016","6012",,,,,"2020","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433384837","0","6012","221","11","213","47","2020","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433376333","4925","6012","221","5",,,"2020","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433383280","0","6012","221","4","213","47","2020","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433387383","5453","6012","221","6","213","18","2021","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433384142","1682","6012","221","6","213","47","2021","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433388736","2515","6012","221","4","214","17","2021","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433387129","4619","6012","221","5","214","17","2021","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433367950","2552","6012","221","4",,,"2021","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433391904","731","6012","221","11","213","18","2021","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433391241","1616","6012","221","5","213","18","2021","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433380806","3325","6012","221","11","214","17","2021","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433380815","3583","6012","220","14","214","17","2021","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433385101","3534","6012",,,"213","18","2021","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433381808","226","6012","221","5","213","47","2021","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433380204","1030","6012",,,"213","47","2021","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433377539","11954","6012","221","6",,,"2021","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433380723","7528","6012",,,"214","17","2021","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433387854","10272","6012","221","6","214","17","2021","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433383326","144","6012","220","14","213","47","2021","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433392011","951","6012","221","4","213","18","2021","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433387415","600","6012","220","14","213","18","2021","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433376365","3727","6012","220","14",,,"2021","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433378283","8558","6012",,,,,"2021","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433384838","127","6012","221","11","213","47","2021","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433376334","4845","6012","221","5",,,"2021","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433368187","3452","6012","221","11",,,"2021","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433383281","37","6012","221","4","213","47","2021","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1441283654","9168","6012",,,,,"2023","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1441283655","4154","6012",,,"213","18","2023","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1441283656","1079","6012",,,"213","47","2023","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1441283657","8089","6012",,,"214","17","2023","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1441283658","12418","6012","221","6",,,"2023","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1441283659","6250","6012","221","6","213","18","2023","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1441283687","1668","6012","221","6","213","47","2023","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1441283688","10750","6012","221","6","214","17","2023","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1441283697","4700","6012","221","5",,,"2023","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1441283698","1425","6012","221","5","213","18","2023","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1441283699","280","6012","221","5","213","47","2023","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1441283700","4420","6012","221","5","214","17","2023","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1441283726","3583","6012","220","14",,,"2023","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1441283727","395","6012","220","14","213","18","2023","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1441283728","52","6012","220","14","213","47","2023","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1441283729","3531","6012","220","14","214","17","2023","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1441283730","2827","6012","221","4",,,"2023","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1441283731","404","6012","221","4","213","18","2023","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1441283732","2827","6012","221","4","214","17","2023","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1441283733","3175","6012","221","11",,,"2023","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1441283734","546","6012","221","11","213","18","2023","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1441283735","3175","6012","221","11","214","17","2023","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433387384","5738","6012","221","6","213","18","2022","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Příspěvky na stravování"
+"1433384143","1595","6012","221","6","213","47","2022","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Používání služebního auta pro soukromé účely"
+"1433388737","2853","6012","221","4","214","17","2022","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Naturální příjmy (kromě služebního auta)"
+"1433377062","4795","6012","221","5",,,"2022","97","19","Průměrné naturální příjmy domácností","Samostatně činní",
+"1433380990","1049","6012",,,"213","47","2022","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Používání služebního auta pro soukromé účely"
+"1433387130","4535","6012","221","5","214","17","2022","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Naturální příjmy (kromě služebního auta)"
+"1433386465","260","6012","221","5","213","47","2022","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Používání služebního auta pro soukromé účely"
+"1433391242","1273","6012","221","5","213","18","2022","97","19","Průměrné naturální příjmy domácností","Samostatně činní","Příspěvky na stravování"
+"1433391905","20","6012","221","11","213","18","2022","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Příspěvky na stravování"
+"1433368693","3147","6012","221","4",,,"2022","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní",
+"1433380807","1953","6012","221","11","214","17","2022","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Naturální příjmy (kromě služebního auta)"
+"1433381594","3202","6012","220","14","214","17","2022","97","19","Průměrné naturální příjmy domácností","Důchodci","Naturální příjmy (kromě služebního auta)"
+"1433385102","3821","6012",,,"213","18","2022","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Příspěvky na stravování"
+"1433380203","22","6012","221","11","213","47","2022","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti","Používání služebního auta pro soukromé účely"
+"1433377540","12665","6012","221","6",,,"2022","97","19","Průměrné naturální příjmy domácností","Zaměstnanci",
+"1433380724","8279","6012",,,"214","17","2022","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem","Naturální příjmy (kromě služebního auta)"
+"1433387855","11070","6012","221","6","214","17","2022","97","19","Průměrné naturální příjmy domácností","Zaměstnanci","Naturální příjmy (kromě služebního auta)"
+"1433383327","54","6012","220","14","213","47","2022","97","19","Průměrné naturální příjmy domácností","Důchodci","Používání služebního auta pro soukromé účely"
+"1433392012","1177","6012","221","4","213","18","2022","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Příspěvky na stravování"
+"1433387416","192","6012","220","14","213","18","2022","97","19","Průměrné naturální příjmy domácností","Důchodci","Příspěvky na stravování"
+"1433376366","3256","6012","220","14",,,"2022","97","19","Průměrné naturální příjmy domácností","Důchodci",
+"1433378284","9328","6012",,,,,"2022","97","19","Průměrné naturální příjmy domácností","Domácnosti celkem",
+"1433368188","1974","6012","221","11",,,"2022","97","19","Průměrné naturální příjmy domácností","Ostatní domácnosti",
+"1433383282","294","6012","221","4","213","47","2022","97","19","Průměrné naturální příjmy domácností","Nezaměstnaní","Používání služebního auta pro soukromé účely"
+"1433373473","150073","8618","220","14",,,"2014","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433375930","205788","8618","221","6",,,"2014","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433378636","108341","8618","221","11",,,"2014","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433369563","197053","8618","221","5",,,"2014","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433373706","184337","8618",,,,,"2014","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433376342","81225","8618","221","4",,,"2014","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433368111","109633","8618","221","11",,,"2015","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433373474","154610","8618","220","14",,,"2015","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433377087","83348","8618","221","4",,,"2015","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369564","213686","8618","221","5",,,"2015","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372855","214269","8618","221","6",,,"2015","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433373707","193303","8618",,,,,"2015","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433368112","117493","8618","221","11",,,"2016","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433373475","159131","8618","220","14",,,"2016","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433377838","91138","8618","221","4",,,"2016","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369565","224133","8618","221","5",,,"2016","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372856","223509","8618","221","6",,,"2016","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433373708","202861","8618",,,,,"2016","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433368114","121659","8618","221","11",,,"2018","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433373477","174766","8618","220","14",,,"2018","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433377840","110601","8618","221","4",,,"2018","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369567","259058","8618","221","5",,,"2018","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372858","256368","8618","221","6",,,"2018","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433372889","232941","8618",,,,,"2018","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433368115","127509","8618","221","11",,,"2019","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433373478","188387","8618","220","14",,,"2019","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433377841","99698","8618","221","4",,,"2019","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369568","278313","8618","221","5",,,"2019","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372859","278164","8618","221","6",,,"2019","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433372890","252041","8618",,,,,"2019","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433368113","107863","8618","221","11",,,"2017","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433373476","166422","8618","220","14",,,"2017","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433377839","99301","8618","221","4",,,"2017","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369566","235643","8618","221","5",,,"2017","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372857","239755","8618","221","6",,,"2017","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433372888","216510","8618",,,,,"2017","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433367938","104388","8618","221","4",,,"2020","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369614","122913","8618","221","11",,,"2020","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433370304","297824","8618","221","5",,,"2020","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372891","264254","8618",,,,,"2020","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433377354","206272","8618","220","14",,,"2020","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433373628","289388","8618","221","6",,,"2020","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433367939","119652","8618","221","4",,,"2021","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433369615","125208","8618","221","11",,,"2021","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433370305","304406","8618","221","5",,,"2021","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433372892","278359","8618",,,,,"2021","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433377355","214110","8618","220","14",,,"2021","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433373629","307570","8618","221","6",,,"2021","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1441283399","260734","8618","220","14",,,"2023","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1441283472","105570","8618","221","4",,,"2023","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1441283545","129746","8618","221","11",,,"2023","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1441283254","359133","8618","221","5",,,"2023","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1441283297","320900","8618",,,,,"2023","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1441283351","343018","8618","221","6",,,"2023","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433367940","102895","8618","221","4",,,"2022","97","19","Průměrné hrubé příjmy domácností","Nezaměstnaní",
+"1433373257","351135","8618","221","5",,,"2022","97","19","Průměrné hrubé příjmy domácností","Samostatně činní",
+"1433369616","113043","8618","221","11",,,"2022","97","19","Průměrné hrubé příjmy domácností","Ostatní domácnosti",
+"1433372893","299126","8618",,,,,"2022","97","19","Průměrné hrubé příjmy domácností","Domácnosti celkem",
+"1433377356","226075","8618","220","14",,,"2022","97","19","Průměrné hrubé příjmy domácností","Důchodci",
+"1433373630","320823","8618","221","6",,,"2022","97","19","Průměrné hrubé příjmy domácností","Zaměstnanci",
+"1433374422","154849","8620",,,,,"2014","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433368160","102943","8620","221","11",,,"2014","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433367941","75079","8620","221","4",,,"2014","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433373258","168387","8620","221","5",,,"2014","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433371293","164457","8620","221","6",,,"2014","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433373508","141739","8620","220","14",,,"2014","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433374423","161795","8620",,,,,"2015","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433368161","101024","8620","221","11",,,"2015","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433367942","77308","8620","221","4",,,"2015","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433373259","181533","8620","221","5",,,"2015","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433371294","170690","8620","221","6",,,"2015","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433373509","146103","8620","220","14",,,"2015","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433374424","168926","8620",,,,,"2016","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433368883","108588","8620","221","11",,,"2016","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433368704","83010","8620","221","4",,,"2016","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433371295","177436","8620","221","6",,,"2016","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433375546","188928","8620","221","5",,,"2016","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433373510","150024","8620","220","14",,,"2016","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433368885","114054","8620","221","11",,,"2018","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433371354","191470","8620",,,,,"2018","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433369428","99726","8620","221","4",,,"2018","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433372064","200769","8620","221","6",,,"2018","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433375548","216554","8620","221","5",,,"2018","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433373512","163889","8620","220","14",,,"2018","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433368100","119108","8620","221","11",,,"2019","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433367974","91842","8620","221","4",,,"2019","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433371355","206032","8620",,,,,"2019","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433372065","216446","8620","221","6",,,"2019","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433375549","231442","8620","221","5",,,"2019","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433377379","176445","8620","220","14",,,"2019","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433368884","100064","8620","221","11",,,"2017","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433368705","90716","8620","221","4",,,"2017","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433371353","178837","8620",,,,,"2017","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433371296","188899","8620","221","6",,,"2017","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433375547","197225","8620","221","5",,,"2017","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433373511","156112","8620","220","14",,,"2017","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433368101","115939","8620","221","11",,,"2020","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433367975","96048","8620","221","4",,,"2020","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433371356","216114","8620",,,,,"2020","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433372066","224441","8620","221","6",,,"2020","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433375550","246429","8620","221","5",,,"2020","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433377380","193739","8620","220","14",,,"2020","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1433368102","118885","8620","221","11",,,"2021","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433368721","109668","8620","221","4",,,"2021","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433371357","236644","8620",,,,,"2021","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433374824","257184","8620","221","5",,,"2021","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433372067","252975","8620","221","6",,,"2021","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433377381","202099","8620","220","14",,,"2021","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1441283192","273361","8620",,,,,"2023","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1441283193","282872","8620","221","6",,,"2023","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1441283196","303691","8620","221","5",,,"2023","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1441283197","249566","8620","220","14",,,"2023","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
+"1441283198","100525","8620","221","4",,,"2023","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1441283199","123707","8620","221","11",,,"2023","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433368103","110121","8620","221","11",,,"2022","97","19","Průměrné disponibilní čisté příjmy domácností","Ostatní domácnosti",
+"1433368722","96489","8620","221","4",,,"2022","97","19","Průměrné disponibilní čisté příjmy domácností","Nezaměstnaní",
+"1433370552","265891","8620","221","6",,,"2022","97","19","Průměrné disponibilní čisté příjmy domácností","Zaměstnanci",
+"1433371358","255118","8620",,,,,"2022","97","19","Průměrné disponibilní čisté příjmy domácností","Domácnosti celkem",
+"1433374825","296387","8620","221","5",,,"2022","97","19","Průměrné disponibilní čisté příjmy domácností","Samostatně činní",
+"1433377382","216817","8620","220","14",,,"2022","97","19","Průměrné disponibilní čisté příjmy domácností","Důchodci",
