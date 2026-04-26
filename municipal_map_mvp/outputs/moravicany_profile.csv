@@ -1,0 +1,5 @@
+﻿dimension,municipality_score,median_similar_size,difference
+demography_score,80.26,59.13,21.13
+labour_score,43.09,69.58,-26.49
+housing_score,100.0,19.38,80.62
+environment_score,3.66,10.8,-7.14

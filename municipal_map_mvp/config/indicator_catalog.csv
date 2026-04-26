@@ -1,0 +1,7 @@
+﻿indicator_id,name,dimension,source,source_key,year,unit,direction,role,influence_level,transform,selected_for_mvp,notes
+population,Počet obyvatel,context,CSU_MOS,111000,2024,obyv.,UP,context,low,none,1,Kontextový ukazatel.
+migration_balance_per_1000,Migrační saldo na 1000 obyvatel,demography,CSU_MOS,110600,2024,na 1000 obyv.,UP,score,low,per_1000,1,Kontextový ukazatel.
+natural_increase,Přirozený přírůstek / úbytek,demography,CSU_MOS,110350,2024,osoby,UP,score,low,none,1,Kontextový ukazatel.
+unemployment_rate,Podíl nezaměstnaných osob,labour,CSU_MOS,500020,2024,%,DOWN,score,low,none,1,Nižší hodnota = lepší skóre.
+completed_flats_per_1000,Dokončené byty na 1000 obyvatel,housing,CSU_MOS,121800,2024,byty / 1000 obyv.,UP,score,medium,per_1000,1,Skórovaný indikátor.
+ecological_stability_coef,Koeficient ekologické stability,environment,CSU_MOS,142000,2024,koeficient,UP,score,low,none,1,Skórovaný / spíše kontextový environmentální ukazatel.
