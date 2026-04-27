@@ -33,3 +33,40 @@ municipal_map_mvp/data/geo/*.prj
 .DS_Store
 __pycache__/
 *.pyc
+
+
+# Large generated map outputs
+municipal_map_mvp/outputs/interactive_map_*.html
+municipal_map_mvp/data/geo/municipalities.geojson
+
+# Jupyter / local notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Local backups and experiments
+checkpoints_zaloha/
+municipal_map_mvp/src/archive/
+municipal_map_mvp/src/experimental/
+municipal_map_mvp/src/methodology/
+*.bak
+*.bak_manual
+
+# Generated project data
+municipal_map_mvp/data/raw/*
+municipal_map_mvp/data/processed/*
+municipal_map_mvp/data/geo/*
+municipal_map_mvp/outputs/*
+
+# Root raw data dumps
+data/raw/*
+
+# Keep folder placeholders
+!municipal_map_mvp/data/raw/.gitkeep
+!municipal_map_mvp/data/processed/.gitkeep
+!municipal_map_mvp/data/geo/.gitkeep
+!municipal_map_mvp/outputs/.gitkeep
+
+# Old CZSO exploratory bundle outputs
+czso_ikz_v10_display_fixed_clean_bundle/czso_municipal_only_screener.py
+czso_ikz_v10_display_fixed_clean_bundle/czso_municipal_selection_test/
+czso_ikz_v10_display_fixed_clean_bundle/municipal_map_mvp/
