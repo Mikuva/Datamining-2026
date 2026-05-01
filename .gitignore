@@ -70,3 +70,11 @@ data/raw/*
 czso_ikz_v10_display_fixed_clean_bundle/czso_municipal_only_screener.py
 czso_ikz_v10_display_fixed_clean_bundle/czso_municipal_selection_test/
 czso_ikz_v10_display_fixed_clean_bundle/municipal_map_mvp/
+
+# municipal_map_mvp data exclusions
+municipal_map_mvp/data/processed/
+municipal_map_mvp/data/raw/mf_monitor/
+
+# municipal_map_mvp data exclusions
+municipal_map_mvp/data/processed/
+municipal_map_mvp/data/raw/mf_monitor/
