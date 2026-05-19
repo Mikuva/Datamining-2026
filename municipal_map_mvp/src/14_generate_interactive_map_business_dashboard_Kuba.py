@@ -1047,6 +1047,81 @@ hr {
     grid-template-columns: 1fr;
 }
 
+.dashboard-columns.is-paired-comparison {
+    grid-template-columns: 1fr;
+}
+
+.comparison-dashboard {
+    min-width: 0;
+}
+
+.comparison-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.comparison-pair.compact {
+    gap: 8px;
+}
+
+.comparison-side {
+    min-width: 0;
+    border-left: 4px solid #111111;
+    padding-left: 10px;
+}
+
+.comparison-side.compare {
+    border-left-color: #d97706;
+}
+
+.comparison-side h3 {
+    font-size: 15px;
+    margin: 0 0 6px 0;
+}
+
+.comparison-value {
+    font-size: 22px;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.comparison-metric-card {
+    min-width: 0;
+}
+
+.comparison-metric-card .label {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.comparison-table th,
+.comparison-table td {
+    vertical-align: top;
+}
+
+.comparison-chart-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.comparison-chart-side {
+    min-width: 0;
+}
+
+.comparison-chart-side h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+}
+
+.comparison-all-groups-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
 .dashboard-header {
     display: flex;
     flex-wrap: wrap;
@@ -1381,7 +1456,9 @@ td:first-child {
     .grid-2,
     .grid-3,
     .all-groups-grid,
-    .land-profile-grid {
+    .land-profile-grid,
+    .comparison-pair,
+    .comparison-chart-pair {
         grid-template-columns: 1fr;
     }
 
@@ -1516,6 +1593,7 @@ td:first-child {
                     <option value="labour">Práce a sociálně-ekonomická situace</option>
                     <option value="housing">Bydlení a výstavba</option>
                     <option value="environment">Krajina a životní prostředí</option>
+                    <option value="all_dashboard">Dashboard všech ukazatelů</option>
                 </select>
             </div>
 
@@ -1690,6 +1768,8 @@ let selectedMunicipalityLayer = null;
 let compareMunicipalityLayer = null;
 let suppressUrlUpdates = false;
 
+const ALL_GROUPS_DASHBOARD_ID = "all_dashboard";
+
 function dashboardId(baseId, slot = "main") {
     return slot === "main" ? baseId : baseId + "__" + slot;
 }
@@ -1767,18 +1847,6 @@ function dashboardShellHtml(slot) {
         </div>
 
         <div class="grid-3" id="${dashboardId("charts_grid", slot)}"></div>
-
-        <div class="all-groups-dashboard">
-            <div class="all-groups-header">
-                <h2>Dashboard všech oblastí ukazatelů</h2>
-                <p>
-                    Souhrnný pohled na všechny tematické oblasti pro vybranou obec.
-                    Grafy ukazují relativní pozici obce v aktuálním benchmarku v čase;
-                    vyšší hodnota znamená příznivější výsledek nebo vyšší kontextovou hodnotu.
-                </p>
-            </div>
-            <div class="all-groups-grid" id="${dashboardId("all_groups_dashboard", slot)}"></div>
-        </div>
     `;
 }
 
@@ -1786,16 +1854,25 @@ function initializeDashboardShells() {
     const main = document.getElementById("dashboard_main");
     const compare = document.getElementById("dashboard_compare");
 
-    if (main) main.innerHTML = dashboardShellHtml("main");
-    if (compare) compare.innerHTML = dashboardShellHtml("compare");
+    if (main) {
+        main.innerHTML = dashboardShellHtml("main");
+        main.dataset.dashboardMode = "single";
+    }
+    if (compare) {
+        compare.innerHTML = dashboardShellHtml("compare");
+        compare.dataset.dashboardMode = "single";
+    }
 }
 
-function setCompareLayoutActive(active) {
+function setCompareLayoutActive(active, paired = false) {
     const columns = document.getElementById("dashboard_columns");
     const compare = document.getElementById("dashboard_compare");
 
-    if (columns) columns.classList.toggle("is-comparing", Boolean(active));
-    if (compare) compare.hidden = !active;
+    if (columns) {
+        columns.classList.toggle("is-comparing", Boolean(active && !paired));
+        columns.classList.toggle("is-paired-comparison", Boolean(active && paired));
+    }
+    if (compare) compare.hidden = !active || paired;
 }
 
 function setStatus(message, isWarning = false) {
@@ -1804,6 +1881,33 @@ function setStatus(message, isWarning = false) {
 
     status.innerHTML = message || "";
     status.style.color = isWarning ? "#8a4b00" : "#586069";
+}
+
+function isAllGroupsDashboardSelected() {
+    return selectedIndicatorGroupId() === ALL_GROUPS_DASHBOARD_ID;
+}
+
+function validIndicatorGroupId(groupId) {
+    return groupId === ALL_GROUPS_DASHBOARD_ID || Boolean(indicatorGroups[groupId]);
+}
+
+function indicatorIdsForAllGroups() {
+    const seen = new Set();
+    const out = [];
+
+    Object.keys(indicatorGroups).forEach(function(groupId) {
+        indicatorGroups[groupId].indicators.forEach(function(indicatorId) {
+            if (indicatorMeta[indicatorId] && !seen.has(indicatorId)) {
+                seen.add(indicatorId);
+                out.push({
+                    id: indicatorId,
+                    label: indicatorGroups[groupId].label + " — " + (indicatorMeta[indicatorId].label || indicatorId)
+                });
+            }
+        });
+    });
+
+    return out;
 }
 
 function selectedIndicatorGroupId() {
@@ -1829,7 +1933,22 @@ function fillIndicatorSelectForGroup(groupId) {
 
     if (!select) return;
 
+    const previousValue = select.value;
     select.innerHTML = "";
+
+    if (groupId === ALL_GROUPS_DASHBOARD_ID) {
+        indicatorIdsForAllGroups().forEach(function(item) {
+            const option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = item.label;
+            select.appendChild(option);
+        });
+
+        if (selectHasValue(select, previousValue)) {
+            select.value = previousValue;
+        }
+        return;
+    }
 
     group.indicators.forEach(function(indicatorId) {
         const meta = indicatorMeta[indicatorId];
@@ -1840,6 +1959,10 @@ function fillIndicatorSelectForGroup(groupId) {
         option.textContent = meta.label;
         select.appendChild(option);
     });
+
+    if (selectHasValue(select, previousValue) && group.indicators.includes(previousValue)) {
+        select.value = previousValue;
+    }
 }
 
 function toggleLegendPanel() {
@@ -1892,6 +2015,28 @@ function settlementType(properties) {
     return properties.settlement_type || "";
 }
 
+function settlementBenchmarkText(properties) {
+    const type = settlementType(properties);
+    const benchmark = benchmarkCategory(properties);
+    const benchmarkText = benchmark
+        ? (String(benchmark).includes("obyvatel") ? String(benchmark) : String(benchmark) + " obyvatel")
+        : "";
+
+    if (type && benchmarkText) {
+        return "Typ sídla: " + type + " (" + benchmarkText + ")";
+    }
+
+    if (type) {
+        return "Typ sídla: " + type;
+    }
+
+    if (benchmarkText) {
+        return "Velikost obce: " + benchmarkText;
+    }
+
+    return "Typ sídla: neuvedeno";
+}
+
 function hasValidPopulation(properties) {
     const pop = Number(properties.population);
     return !isNaN(pop) && pop > 0;
@@ -1916,9 +2061,8 @@ function selectedYear() {
 
 function municipalityLabel(properties) {
     const name = properties.obec || "Neznámá obec";
-    const code = properties.kod_obce || "";
     const okres = properties.okres || "";
-    return `${name} — ${code} — ${okres}`;
+    return okres ? `${name} — ${okres}` : name;
 }
 
 function formatValue(value, digits = 2) {
@@ -2024,6 +2168,12 @@ function fillMunicipalitySearch() {
 
 function findMunicipalityFeature(query) {
     const q = normalizeText(query);
+    const queryParts = String(query || "").split("—").map(function(part) {
+        return normalizeText(part);
+    });
+    const qNameOnly = queryParts[0] || "";
+    const qDistrictOnly = queryParts[1] || "";
+    const nameQuery = qNameOnly || q;
 
     if (q === "") return null;
 
@@ -2039,19 +2189,21 @@ function findMunicipalityFeature(query) {
     }
 
     const exactName = geoData.features.find(function(feature) {
-        return normalizeText(feature.properties.obec) === q;
+        const nameMatches = normalizeText(feature.properties.obec) === nameQuery;
+        const districtMatches = !qDistrictOnly || normalizeText(feature.properties.okres) === qDistrictOnly;
+        return nameMatches && districtMatches;
     });
 
     if (exactName) return exactName;
 
     const startsWithName = geoData.features.find(function(feature) {
-        return normalizeText(feature.properties.obec).startsWith(q);
+        return normalizeText(feature.properties.obec).startsWith(nameQuery);
     });
 
     if (startsWithName) return startsWithName;
 
     const containsName = geoData.features.find(function(feature) {
-        return normalizeText(feature.properties.obec).includes(q);
+        return normalizeText(feature.properties.obec).includes(nameQuery);
     });
 
     if (containsName) return containsName;
@@ -2427,12 +2579,10 @@ function tooltipContent(properties) {
 
     return `
         <b>${properties.obec || "Neznámá obec"}</b><br>
-        Kód obce: ${properties.kod_obce || ""}<br>
         Okres: ${properties.okres || ""}<br>
         ORP: ${properties.orp || ""}<br>
         Počet obyvatel: ${formatValue(properties.population, 0)}<br>
-        Velikostní benchmark: ${benchmarkCategory(properties) || ""}<br>
-        Typ sídla: ${settlementType(properties) || ""}<br>
+        ${settlementBenchmarkText(properties)}<br>
         <hr>
         <b>${meta.label} (${year}): ${formatIndicatorValue(rawValue, meta)}</b><br>
         Pořadí v benchmarku: ${rankInfo.text}<br>
@@ -2466,7 +2616,9 @@ let geoLayer = L.geoJSON(geoData, {
         });
 
         layer.on("mouseout", function() {
-            if (!isSelectedMunicipalityLayer(layer)) {
+            if (isSelectedMunicipalityLayer(layer)) {
+                applySelectedLayerStyles();
+            } else {
                 geoLayer.resetStyle(layer);
                 applySelectedLayerStyles();
             }
@@ -2499,34 +2651,27 @@ function isSelectedMunicipalityLayer(layer) {
 function applySelectedLayerStyles() {
     if (selectedMunicipalityLayer) {
         selectedMunicipalityLayer.setStyle({
-            weight: 3,
+            weight: 4,
             color: "#111111",
-            fillOpacity: 0.96,
+            fillOpacity: 0.98,
             dashArray: null
         });
+        if (selectedMunicipalityLayer.bringToFront) selectedMunicipalityLayer.bringToFront();
     }
 
     if (compareMunicipalityLayer) {
         compareMunicipalityLayer.setStyle({
-            weight: 3,
-            color: "#0f766e",
-            fillOpacity: 0.96,
-            dashArray: "7 5"
+            weight: 4,
+            color: "#d97706",
+            fillOpacity: 0.98,
+            dashArray: "8 4"
         });
+        if (compareMunicipalityLayer.bringToFront) compareMunicipalityLayer.bringToFront();
     }
 }
 
 function refreshSelectedDashboards() {
-    if (selectedMunicipalityLayer) {
-        updateDashboard(selectedMunicipalityLayer.feature.properties, "main");
-    }
-
-    if (compareMunicipalityLayer) {
-        setCompareLayoutActive(true);
-        updateDashboard(compareMunicipalityLayer.feature.properties, "compare");
-    } else {
-        setCompareLayoutActive(false);
-    }
+    renderSelectedDashboardState();
 }
 
 function selectMunicipalityLayer(layer, setBenchmarkFilter = false, updateUrl = true) {
@@ -2544,12 +2689,8 @@ function selectMunicipalityLayer(layer, setBenchmarkFilter = false, updateUrl = 
     }
 
     updateMap(false);
-    updateDashboard(layer.feature.properties, "main");
-
-    if (compareMunicipalityLayer) {
-        setCompareLayoutActive(true);
-        updateDashboard(compareMunicipalityLayer.feature.properties, "compare");
-    }
+    renderSelectedDashboardState();
+    fitComparisonMapIfNeeded();
 
     if (updateUrl) {
         updateUrlFromState();
@@ -2571,12 +2712,11 @@ function selectCompareLayer(layer, updateUrl = true, fitToSelection = true) {
 
     compareMunicipalityLayer = layer;
     setMunicipalityInputValue("compare", layer.feature.properties);
-    setCompareLayoutActive(true);
     updateMap(false);
-    updateDashboard(layer.feature.properties, "compare");
+    renderSelectedDashboardState();
 
     if (fitToSelection) {
-        fitBoundsToSelectedLayers();
+        fitComparisonMapIfNeeded();
     }
 
     if (updateUrl) {
@@ -2595,6 +2735,7 @@ function clearCompareMunicipality(updateUrl = true, message = "") {
     if (input) input.value = "";
 
     updateMap(false);
+    renderSelectedDashboardState();
 
     if (message) {
         setStatus(message, true);
@@ -2607,8 +2748,7 @@ function clearCompareMunicipality(updateUrl = true, message = "") {
     }
 }
 
-function fitBoundsToSelectedLayers() {
-    const layers = [selectedMunicipalityLayer, compareMunicipalityLayer].filter(Boolean);
+function fitBoundsToSelectedLayers(layers = [selectedMunicipalityLayer, compareMunicipalityLayer].filter(Boolean)) {
     if (!layers.length) return;
 
     const group = L.featureGroup(layers);
@@ -2616,6 +2756,43 @@ function fitBoundsToSelectedLayers() {
         maxZoom: 12,
         padding: [24, 24]
     });
+}
+
+function districtLayersForComparison() {
+    if (!selectedMunicipalityLayer || !compareMunicipalityLayer) return [];
+
+    const mainDistrict = selectedMunicipalityLayer.feature.properties.okres || "";
+    const compareDistrict = compareMunicipalityLayer.feature.properties.okres || "";
+
+    if (!mainDistrict || !compareDistrict || mainDistrict !== compareDistrict) {
+        return [];
+    }
+
+    const layers = [];
+    geoLayer.eachLayer(function(layer) {
+        if (
+            layer.feature &&
+            layer.feature.properties &&
+            layer.feature.properties.okres === mainDistrict
+        ) {
+            layers.push(layer);
+        }
+    });
+
+    return layers;
+}
+
+function fitComparisonMapIfNeeded() {
+    if (!selectedMunicipalityLayer || !compareMunicipalityLayer) return;
+
+    const districtLayers = districtLayersForComparison();
+
+    if (districtLayers.length) {
+        fitBoundsToSelectedLayers(districtLayers);
+        return;
+    }
+
+    fitBoundsToSelectedLayers();
 }
 
 function selectCompareMunicipality() {
@@ -2667,7 +2844,7 @@ function zoomToMunicipality() {
     selectMunicipalityLayer(foundLayer, true, true);
 
     if (compareMunicipalityLayer) {
-        fitBoundsToSelectedLayers();
+        fitComparisonMapIfNeeded();
     } else {
         map.fitBounds(foundLayer.getBounds(), {
             maxZoom: 12
@@ -2680,12 +2857,8 @@ function zoomToMunicipality() {
     setStatus(
         "Nalezena obec: " +
         (feature.properties.obec || "") +
-        " (" +
-        (feature.properties.kod_obce || "") +
-        "), benchmark: " +
-        (benchmarkCategory(feature.properties) || "neuvedeno") +
-        ", typ sídla: " +
-        (settlementType(feature.properties) || "neuvedeno") +
+        ", " +
+        settlementBenchmarkText(feature.properties).toLowerCase() +
         "."
     );
 }
@@ -2859,9 +3032,57 @@ function createIndicatorCards(props, slot = "main") {
         <div class="card">
             <div class="label">Pozice mezi podobnými obcemi</div>
             <div class="value" style="font-size:18px">${rankInfo.text}</div>
-            <div class="sub">${benchmarkText}, benchmark: ${benchmarkCategory(props) || ""}, rok ${year}</div>
+            <div class="sub">${benchmarkText}, ${settlementBenchmarkText(props).toLowerCase()}, rok ${year}</div>
         </div>
     `;
+}
+
+function currentValueForTrendTable(props, indicator) {
+    if (isWasteIndicator(indicator)) {
+        return props[indicator + "_2023"] ?? props[indicator];
+    }
+
+    if (isLandUseIndicator(indicator)) {
+        return props[indicator];
+    }
+
+    return props[indicator + "_2024"] ?? props[indicator];
+}
+
+function trendRowsForSelectedGroup() {
+    const group = selectedIndicatorGroup();
+    let periodNote = "";
+    let rows = [];
+
+    if (selectedIndicatorGroupId() === "environment") {
+        rows = ["ecological_stability_coef"];
+        periodNote = `
+            <div class="small-note" style="margin-bottom:10px">
+                U krajiny dává jako časový trend smysl především koeficient ekologické stability.
+                Katastrální ukazatele jako výměra, podíl orné půdy, lesů nebo vodních ploch jsou níže zobrazené jako statický profil území.
+            </div>
+        `;
+    } else if (group === indicatorGroups.waste) {
+        rows = group.indicators;
+        periodNote = `
+            <div class="small-note" style="margin-bottom:10px">
+                Odpadové ukazatele jsou z VISOH2. Aktuální hodnota odpovídá poslednímu dostupnému roku,
+                typicky 2023. Meziroční změna odpovídá období 2023–2022 a dlouhodobá změna období 2023–2021.
+            </div>
+        `;
+    } else {
+        rows = group.indicators;
+        periodNote = `
+            <div class="small-note" style="margin-bottom:10px">
+                Ukazatele v této oblasti jsou zobrazeny pro období 2020–2024.
+            </div>
+        `;
+    }
+
+    return {
+        rows: rows,
+        periodNote: periodNote
+    };
 }
 
 function createTrendTable(props, slot = "main") {
@@ -2870,18 +3091,6 @@ function createTrendTable(props, slot = "main") {
     const title = dashboardEl("trend_table_title", slot);
     if (title) {
         title.innerHTML = "Trendy: " + group.label;
-    }
-
-    function currentValueForTrendTable(props, indicator) {
-        if (isWasteIndicator(indicator)) {
-            return props[indicator + "_2023"] ?? props[indicator];
-        }
-
-        if (isLandUseIndicator(indicator)) {
-            return props[indicator];
-        }
-
-        return props[indicator + "_2024"] ?? props[indicator];
     }
 
     function createIndicatorRow(indicator) {
@@ -2918,33 +3127,9 @@ function createTrendTable(props, slot = "main") {
         `;
     }
 
-    let periodNote = "";
-    let rows = [];
-
-    if (selectedIndicatorGroupId() === "environment") {
-        rows = ["ecological_stability_coef"];
-        periodNote = `
-            <div class="small-note" style="margin-bottom:10px">
-                U krajiny dává jako časový trend smysl především koeficient ekologické stability.
-                Katastrální ukazatele jako výměra, podíl orné půdy, lesů nebo vodních ploch jsou níže zobrazené jako statický profil území.
-            </div>
-        `;
-    } else if (group === indicatorGroups.waste) {
-        rows = group.indicators;
-        periodNote = `
-            <div class="small-note" style="margin-bottom:10px">
-                Odpadové ukazatele jsou z VISOH2. Aktuální hodnota odpovídá poslednímu dostupnému roku,
-                typicky 2023. Meziroční změna odpovídá období 2023–2022 a dlouhodobá změna období 2023–2021.
-            </div>
-        `;
-    } else {
-        rows = group.indicators;
-        periodNote = `
-            <div class="small-note" style="margin-bottom:10px">
-                Ukazatele v této oblasti jsou zobrazeny pro období 2020–2024.
-            </div>
-        `;
-    }
+    const rowConfig = trendRowsForSelectedGroup();
+    const rows = rowConfig.rows;
+    const periodNote = rowConfig.periodNote;
 
     let html = `
         <div style="margin-bottom:8px;">
@@ -3092,15 +3277,7 @@ function createRawTable(props, slot = "main") {
     group.indicators.forEach(function(indicator) {
         const meta = indicatorMeta[indicator] || {};
 
-        let value = null;
-
-        if (isWasteIndicator(indicator)) {
-            value = props[indicator + "_2023"] ?? props[indicator];
-        } else if (isLandUseIndicator(indicator)) {
-            value = props[indicator];
-        } else {
-            value = props[indicator + "_2024"] ?? props[indicator];
-        }
+        const value = rawTableValue(props, indicator);
 
         html += `
             <tr>
@@ -3114,6 +3291,18 @@ function createRawTable(props, slot = "main") {
 
     const table = dashboardEl("raw_table", slot);
     if (table) table.innerHTML = html;
+}
+
+function rawTableValue(props, indicator) {
+    if (isWasteIndicator(indicator)) {
+        return props[indicator + "_2023"] ?? props[indicator];
+    }
+
+    if (isLandUseIndicator(indicator)) {
+        return props[indicator];
+    }
+
+    return props[indicator + "_2024"] ?? props[indicator];
 }
 
 function numOrNull(value) {
@@ -3832,7 +4021,7 @@ function createCrossDomainDiagnosticsPanel(props, slot = "main") {
     container.innerHTML = html;
 }
 
-function createBusinessSummary(props, slot = "main") {
+function businessSummaryHtml(props) {
     const indicator = selectedIndicatorId();
     const meta = selectedIndicatorMeta();
     const year = selectedYear();
@@ -3890,8 +4079,12 @@ function createBusinessSummary(props, slot = "main") {
         `;
     }
 
+    return text;
+}
+
+function createBusinessSummary(props, slot = "main") {
     const summary = dashboardEl("business_summary", slot);
-    if (summary) summary.innerHTML = text;
+    if (summary) summary.innerHTML = businessSummaryHtml(props);
 }
 
 function trendValues(props, indicator) {
@@ -4532,33 +4725,37 @@ function createLandProfilePanel(props, slot = "main") {
     `;
 }
 
-function updateDashboardWarning(props, slot = "main") {
-    const warningBox = dashboardEl("dash_warning", slot);
-    if (!warningBox) return;
-
+function dashboardWarningHtml(props) {
     if (!hasValidPopulation(props)) {
-        warningBox.innerHTML = `
+        return `
             <div class="warning-box">
                 ⚠ Pro obec nejsou dostupná validní populační data. Ukazatele přepočtené na obyvatele,
                 věková struktura a některé trendy nejsou spolehlivě interpretovatelné.
             </div>
         `;
-        return;
     }
 
     if (props.volatility_warning) {
-        warningBox.innerHTML = `
+        return `
             <div class="warning-box">
                 ⚠ ${props.volatility_warning}
             </div>
         `;
-        return;
     }
 
-    warningBox.innerHTML = "";
+    return "";
+}
+
+function updateDashboardWarning(props, slot = "main") {
+    const warningBox = dashboardEl("dash_warning", slot);
+    if (!warningBox) return;
+
+    warningBox.innerHTML = dashboardWarningHtml(props);
 }
 
 function updateDashboard(props, slot = "main") {
+    ensureDashboardShell(slot);
+
     const title = dashboardEl("dash_title", slot);
     const subtitle = dashboardEl("dash_subtitle", slot);
 
@@ -4568,11 +4765,14 @@ function updateDashboard(props, slot = "main") {
 
     if (subtitle) {
         subtitle.innerHTML =
-        "Kód obce: " + (props.kod_obce || "") +
-        " | Okres: " + (props.okres || "") +
+        "Okres: " + (props.okres || "neuvedeno") +
         " | ORP: " + (props.orp || "") +
-        " | Benchmark: " + (benchmarkCategory(props) || "") +
-        " | Typ sídla: " + (settlementType(props) || "");
+        " | " + settlementBenchmarkText(props);
+    }
+
+    if (isAllGroupsDashboardSelected()) {
+        updateAllGroupsOnlyDashboard(props, slot);
+        return;
     }
 
     updateDashboardWarning(props, slot);
@@ -4585,7 +4785,608 @@ function updateDashboard(props, slot = "main") {
     createRawTable(props, slot);
     createBusinessSummary(props, slot);
     updateCharts(props, slot);
+}
+
+function dashboardSection(slot = "main") {
+    return document.getElementById(slot === "compare" ? "dashboard_compare" : "dashboard_main");
+}
+
+function ensureDashboardShell(slot = "main") {
+    const section = dashboardSection(slot);
+    if (!section) return;
+
+    if (section.dataset.dashboardMode !== "single") {
+        section.innerHTML = dashboardShellHtml(slot);
+        section.dataset.dashboardMode = "single";
+    }
+}
+
+function allGroupsDashboardShellHtml(props, slot = "main") {
+    return `
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1 id="${dashboardId("dash_title", slot)}">Dashboard všech ukazatelů: ${props.obec || "obec"}</h1>
+                <p id="${dashboardId("dash_subtitle", slot)}">
+                    Okres: ${props.okres || "neuvedeno"} | ORP: ${props.orp || ""} | ${settlementBenchmarkText(props)}
+                </p>
+                <div id="${dashboardId("dash_warning", slot)}">${dashboardWarningHtml(props)}</div>
+            </div>
+            <div>
+                <span class="badge">všechny oblasti</span>
+                <span class="badge">pozice v benchmarku</span>
+                <span class="badge">trend v čase</span>
+            </div>
+        </div>
+
+        <div class="all-groups-dashboard" style="margin-top:0;">
+            <div class="all-groups-header">
+                <h2>Souhrnný pohled napříč oblastmi</h2>
+                <p>
+                    Grafy ukazují relativní pozici obce v aktuálním benchmarku v čase;
+                    vyšší hodnota znamená příznivější výsledek nebo vyšší kontextovou hodnotu.
+                </p>
+            </div>
+            <div class="all-groups-grid" id="${dashboardId("all_groups_dashboard", slot)}"></div>
+        </div>
+    `;
+}
+
+function updateAllGroupsOnlyDashboard(props, slot = "main") {
+    const section = dashboardSection(slot);
+    if (!section) return;
+
+    destroyCharts(slot);
+    section.innerHTML = allGroupsDashboardShellHtml(props, slot);
+    section.dataset.dashboardMode = "all";
     updateAllGroupsDashboard(props, slot);
+}
+
+function compareSideHeading(props, isCompare = false) {
+    return `
+        <div class="comparison-side ${isCompare ? "compare" : ""}">
+            <h3>${props.obec || "obec"}</h3>
+            <div class="small-note">
+                Okres: ${props.okres || "neuvedeno"} | ${settlementBenchmarkText(props)}
+            </div>
+            ${dashboardWarningHtml(props)}
+        </div>
+    `;
+}
+
+function comparisonMetricCard(label, mainHtml, compareHtml, mainProps, compareProps, sub = "") {
+    return `
+        <div class="card comparison-metric-card">
+            <div class="label">${label}</div>
+            <div class="comparison-pair compact">
+                <div class="comparison-side">
+                    <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                    <div class="comparison-value">${mainHtml}</div>
+                </div>
+                <div class="comparison-side compare">
+                    <h3>${compareProps.obec || "Porovnávaná obec"}</h3>
+                    <div class="comparison-value">${compareHtml}</div>
+                </div>
+            </div>
+            ${sub ? `<div class="sub">${sub}</div>` : ""}
+        </div>
+    `;
+}
+
+function comparisonCardsHtml(mainProps, compareProps) {
+    const indicator = selectedIndicatorId();
+    const meta = selectedIndicatorMeta();
+    const year = selectedYear();
+
+    const mainValue = getIndicatorValueForYear(mainProps, indicator, year);
+    const compareValue = getIndicatorValueForYear(compareProps, indicator, year);
+    const mainDiff = isLandUseIndicator(indicator)
+        ? "statický / aktuální údaj"
+        : signedValue(getDiffPeriod(mainProps, indicator), meta.digits ?? 2);
+    const compareDiff = isLandUseIndicator(indicator)
+        ? "statický / aktuální údaj"
+        : signedValue(getDiffPeriod(compareProps, indicator), meta.digits ?? 2);
+    const mainRank = benchmarkRankInfo(mainProps);
+    const compareRank = benchmarkRankInfo(compareProps);
+
+    return `
+        <div class="cards">
+            <div class="card">
+                <div class="label">Ukazatel</div>
+                <div class="value" style="font-size:18px">${meta.label}</div>
+                <div class="sub">${meta.description || ""}</div>
+            </div>
+            ${comparisonMetricCard(
+                "Hodnota " + year,
+                formatIndicatorValue(mainValue, meta),
+                formatIndicatorValue(compareValue, meta),
+                mainProps,
+                compareProps,
+                "surová hodnota ve vybraném roce nebo poslední dostupný údaj"
+            )}
+            ${comparisonMetricCard(
+                "Dlouhodobá změna",
+                mainDiff,
+                compareDiff,
+                mainProps,
+                compareProps,
+                "v jednotce ukazatele"
+            )}
+            ${comparisonMetricCard(
+                "Pozice mezi podobnými obcemi",
+                mainRank.text,
+                compareRank.text,
+                mainProps,
+                compareProps,
+                "rok " + year
+            )}
+        </div>
+    `;
+}
+
+function comparisonTrendTableHtml(mainProps, compareProps) {
+    const group = selectedIndicatorGroup();
+    const rowConfig = trendRowsForSelectedGroup();
+
+    let html = `
+        <div style="margin-bottom:8px;">
+            <div style="font-weight:700; font-size:15px;">${group.label}</div>
+            <div class="small-note">${group.subtitle}</div>
+        </div>
+        ${rowConfig.periodNote}
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Ukazatel</th>
+                    <th>${mainProps.obec || "Hlavní obec"}</th>
+                    <th>${compareProps.obec || "Porovnání"}</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    rowConfig.rows.forEach(function(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+        if (!meta) return;
+
+        const mainValue = currentValueForTrendTable(mainProps, indicator);
+        const compareValue = currentValueForTrendTable(compareProps, indicator);
+        const mainDiff = isLandUseIndicator(indicator) ? "—" : signedValue(getDiffPeriod(mainProps, indicator), meta.digits ?? 2);
+        const compareDiff = isLandUseIndicator(indicator) ? "—" : signedValue(getDiffPeriod(compareProps, indicator), meta.digits ?? 2);
+
+        html += `
+            <tr>
+                <td>${meta.label || indicator}</td>
+                <td>
+                    <b>${formatIndicatorValue(mainValue, meta)}</b><br>
+                    <span class="small-note">dlouhodobě: ${mainDiff}</span>
+                </td>
+                <td>
+                    <b>${formatIndicatorValue(compareValue, meta)}</b><br>
+                    <span class="small-note">dlouhodobě: ${compareDiff}</span>
+                </td>
+                <td>
+                    ${trendBadge(getTrend(mainProps, indicator))}
+                    ${trendBadge(getTrend(compareProps, indicator))}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    return html;
+}
+
+function comparisonRawTableHtml(mainProps, compareProps) {
+    const group = selectedIndicatorGroup();
+    let html = `
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Ukazatel</th>
+                    <th>${mainProps.obec || "Hlavní obec"}</th>
+                    <th>${compareProps.obec || "Porovnání"}</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    group.indicators.forEach(function(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+        html += `
+            <tr>
+                <td>${meta.label || indicator}</td>
+                <td>${formatIndicatorValue(rawTableValue(mainProps, indicator), meta)}</td>
+                <td>${formatIndicatorValue(rawTableValue(compareProps, indicator), meta)}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    return html;
+}
+
+function comparisonDiagnosticsHtml(mainProps, compareProps, builder, emptyText = "") {
+    function itemsHtml(props) {
+        const items = builder(props);
+        if (!items.length && emptyText) return `<p>${emptyText}</p>`;
+
+        return items.map(function(item, index) {
+            const title = item.title || "";
+            const text = item.action || item.text || "";
+            const evidence = item.evidence && item.evidence.length
+                ? `
+                    <ul style="margin-top:6px; padding-left:18px;">
+                        ${item.evidence.slice(0, 3).map(function(e) {
+                            return "<li>" + e + "</li>";
+                        }).join("")}
+                    </ul>
+                `
+                : "";
+
+            return `
+                <div class="diagnostic-item">
+                    <span class="badge ${diagnosticBadgeClass(item.level)}">
+                        ${index + 1}. ${diagnosticLabel(item.level)}
+                    </span>
+                    <b>${title}</b>
+                    <div class="diagnostic-text">${text}</div>
+                    ${evidence}
+                </div>
+            `;
+        }).join("");
+    }
+
+    return `
+        <div class="comparison-pair">
+            <div class="comparison-side">
+                <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                ${itemsHtml(mainProps)}
+            </div>
+            <div class="comparison-side compare">
+                <h3>${compareProps.obec || "Porovnání"}</h3>
+                ${itemsHtml(compareProps)}
+            </div>
+        </div>
+    `;
+}
+
+function comparisonAgeStructureHtml(mainProps, compareProps) {
+    if (selectedIndicatorGroupId() !== "demography") return "";
+
+    function ageRows(props) {
+        if (!hasValidPopulation(props)) {
+            return `<div class="warning-box">Pro obec nejsou dostupná validní populační data.</div>`;
+        }
+
+        return `
+            <table>
+                <tbody>
+                    <tr><td>Děti 0–14</td><td>${formatValue(props.children_share ?? props.children_share_2024, 2)} %</td></tr>
+                    <tr><td>Produktivní věk 15–64</td><td>${formatValue(props.working_age_share ?? props.working_age_share_2024, 2)} %</td></tr>
+                    <tr><td>Senioři 65+</td><td>${formatValue(props.senior_share ?? props.senior_share_2024, 2)} %</td></tr>
+                    <tr><td><b>Index stáří</b></td><td>${formatValue(props.ageing_index ?? props.ageing_index_2024, 2)}</td></tr>
+                </tbody>
+            </table>
+        `;
+    }
+
+    return `
+        <div class="panel" style="margin-top:14px;">
+            <h2>Věková struktura obce</h2>
+            <div class="comparison-pair">
+                <div class="comparison-side">
+                    <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                    ${ageRows(mainProps)}
+                </div>
+                <div class="comparison-side compare">
+                    <h3>${compareProps.obec || "Porovnání"}</h3>
+                    ${ageRows(compareProps)}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function comparisonLandProfileHtml(mainProps, compareProps) {
+    if (selectedIndicatorGroupId() !== "environment") return "";
+
+    function landSummary(props) {
+        const area = propNumber(props, "municipality_area_km2");
+        const density = propNumber(props, "population_density_per_km2");
+        const kes = propNumber(props, "ecological_stability_coef");
+        const stable = propNumber(props, "natural_stable_area_share");
+        const kesClass = classifyKES(kes);
+
+        return `
+            <div class="cards" style="grid-template-columns: repeat(2, minmax(140px, 1fr)); margin-top:0;">
+                <div class="card">
+                    <div class="label">Výměra obce</div>
+                    <div class="value">${formatValue(area, 2)} km²</div>
+                </div>
+                <div class="card">
+                    <div class="label">Hustota obyvatel</div>
+                    <div class="value">${formatValue(density, 1)}</div>
+                    <div class="sub">obyv./km²</div>
+                </div>
+                <div class="card">
+                    <div class="label">Koeficient ekologické stability</div>
+                    <div class="value">${formatValue(kes, 4)}</div>
+                    <div class="sub">${kesClass.label}</div>
+                </div>
+                <div class="card">
+                    <div class="label">Přírodně stabilnější plochy</div>
+                    <div class="value">${formatValue(stable, 2)} %</div>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="panel" style="margin-top:14px;">
+            <h2>Profil využití území</h2>
+            <div class="comparison-pair">
+                <div class="comparison-side">
+                    <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                    ${landSummary(mainProps)}
+                </div>
+                <div class="comparison-side compare">
+                    <h3>${compareProps.obec || "Porovnání"}</h3>
+                    ${landSummary(compareProps)}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderComparisonCharts(mainProps, compareProps) {
+    const grid = document.getElementById("comparison_charts_grid");
+    if (!grid) return;
+
+    const indicators = chartIndicatorListForSelectedGroup();
+    grid.innerHTML = "";
+
+    indicators.forEach(function(indicator, index) {
+        const meta = indicatorMeta[indicator];
+        if (!meta) return;
+
+        const mainCanvasId = "comparison_chart_main_" + index + "_" + indicator;
+        const compareCanvasId = "comparison_chart_compare_" + index + "_" + indicator;
+
+        grid.innerHTML += `
+            <div class="chart-card">
+                <h3>${meta.label}</h3>
+                <div class="comparison-chart-pair">
+                    <div class="comparison-chart-side">
+                        <h4>${mainProps.obec || "Hlavní obec"}</h4>
+                        <div class="chart-wrap"><canvas id="${mainCanvasId}"></canvas></div>
+                    </div>
+                    <div class="comparison-chart-side">
+                        <h4>${compareProps.obec || "Porovnání"}</h4>
+                        <div class="chart-wrap"><canvas id="${compareCanvasId}"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    indicators.forEach(function(indicator, index) {
+        const meta = indicatorMeta[indicator];
+        if (!meta) return;
+
+        const yearsForChart = chartYearsForIndicator(indicator);
+        makeLineChart(
+            "comparison_chart_main_" + index + "_" + indicator,
+            meta.label,
+            trendValues(mainProps, indicator),
+            yearsForChart,
+            meta,
+            "comparison"
+        );
+        makeLineChart(
+            "comparison_chart_compare_" + index + "_" + indicator,
+            meta.label,
+            trendValues(compareProps, indicator),
+            yearsForChart,
+            meta,
+            "comparison"
+        );
+    });
+}
+
+function renderComparisonAllGroupsDashboard(mainProps, compareProps) {
+    const container = document.getElementById("comparison_all_groups_dashboard");
+    if (!container) return;
+
+    const groupIds = Object.keys(indicatorGroups);
+    let html = "";
+
+    groupIds.forEach(function(groupId) {
+        const group = indicatorGroups[groupId];
+        const chartIndicators = chartIndicatorsForGroupDashboard(groupId, group);
+        const mainCanvasId = "comparison_all_main_" + groupId;
+        const compareCanvasId = "comparison_all_compare_" + groupId;
+
+        html += `
+            <div class="group-dashboard-card">
+                <div class="group-dashboard-top">
+                    <div>
+                        <h3>${group.label}</h3>
+                        <div class="small-note">${group.subtitle}</div>
+                    </div>
+                    <span class="badge">${chartIndicators.length} v grafu</span>
+                </div>
+                <div class="comparison-pair">
+                    <div class="comparison-side">
+                        <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                        <div class="group-dashboard-summary">
+                            ${groupSummaryText(mainProps, groupId, group, chartIndicators)}
+                            <div class="group-signal-list">${groupSignalRows(mainProps, groupId, group)}</div>
+                        </div>
+                        <div class="group-chart-wrap"><canvas id="${mainCanvasId}"></canvas></div>
+                    </div>
+                    <div class="comparison-side compare">
+                        <h3>${compareProps.obec || "Porovnání"}</h3>
+                        <div class="group-dashboard-summary">
+                            ${groupSummaryText(compareProps, groupId, group, chartIndicators)}
+                            <div class="group-signal-list">${groupSignalRows(compareProps, groupId, group)}</div>
+                        </div>
+                        <div class="group-chart-wrap"><canvas id="${compareCanvasId}"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    groupIds.forEach(function(groupId) {
+        const group = indicatorGroups[groupId];
+        const chartIndicators = chartIndicatorsForGroupDashboard(groupId, group);
+        if (!chartIndicators.length) return;
+
+        const yearsForChart = groupId === "waste" ? wasteYears : allYears;
+
+        function datasetsFor(props) {
+            return chartIndicators.map(function(indicator) {
+                const meta = indicatorMeta[indicator] || {};
+                return {
+                    label: meta.label || indicator,
+                    values: yearsForChart.map(function(year) {
+                        return benchmarkScoreForIndicatorYear(props, indicator, year);
+                    })
+                };
+            });
+        }
+
+        makeBenchmarkPositionChart("comparison_all_main_" + groupId, datasetsFor(mainProps), yearsForChart, "comparison");
+        makeBenchmarkPositionChart("comparison_all_compare_" + groupId, datasetsFor(compareProps), yearsForChart, "comparison");
+    });
+}
+
+function renderComparisonDashboard(mainProps, compareProps) {
+    const section = dashboardSection("main");
+    if (!section) return;
+
+    destroyCharts();
+    setCompareLayoutActive(true, true);
+    section.dataset.dashboardMode = "comparison";
+
+    if (isAllGroupsDashboardSelected()) {
+        section.innerHTML = `
+            <div class="comparison-dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h1>Porovnání všech ukazatelů: ${mainProps.obec || "obec"} × ${compareProps.obec || "obec"}</h1>
+                        <p>${settlementBenchmarkText(mainProps)} | ${settlementBenchmarkText(compareProps)}</p>
+                    </div>
+                    <div>
+                        <span class="badge">všechny oblasti</span>
+                        <span class="badge">pozice v benchmarku</span>
+                    </div>
+                </div>
+                <div class="comparison-pair" style="margin-bottom:14px;">
+                    ${compareSideHeading(mainProps)}
+                    ${compareSideHeading(compareProps, true)}
+                </div>
+                <div class="comparison-all-groups-grid" id="comparison_all_groups_dashboard"></div>
+            </div>
+        `;
+        renderComparisonAllGroupsDashboard(mainProps, compareProps);
+        return;
+    }
+
+    section.innerHTML = `
+        <div class="comparison-dashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">
+                    <h1>Porovnání obcí: ${mainProps.obec || "obec"} × ${compareProps.obec || "obec"}</h1>
+                    <p>Stejné ukazatele jsou spárované vedle sebe pro rychlé porovnání.</p>
+                </div>
+                <div>
+                    <span class="badge">hlavní obec</span>
+                    <span class="badge">porovnávaná obec</span>
+                    <span class="badge">stejná metrika vedle sebe</span>
+                </div>
+            </div>
+
+            <div class="comparison-pair" style="margin-bottom:14px;">
+                ${compareSideHeading(mainProps)}
+                ${compareSideHeading(compareProps, true)}
+            </div>
+
+            ${comparisonCardsHtml(mainProps, compareProps)}
+
+            <div class="grid-2">
+                <div class="panel">
+                    <h2>Interpretace vybraného ukazatele</h2>
+                    <div class="comparison-pair">
+                        <div class="comparison-side">
+                            <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                            <p>${businessSummaryHtml(mainProps)}</p>
+                        </div>
+                        <div class="comparison-side compare">
+                            <h3>${compareProps.obec || "Porovnání"}</h3>
+                            <p>${businessSummaryHtml(compareProps)}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h2>Trendy vybrané oblasti</h2>
+                    ${comparisonTrendTableHtml(mainProps, compareProps)}
+                </div>
+            </div>
+
+            ${comparisonLandProfileHtml(mainProps, compareProps)}
+
+            <div class="panel" style="margin-top:14px;">
+                <h2>Priority pro starostu</h2>
+                ${comparisonDiagnosticsHtml(mainProps, compareProps, buildMayorPriorities)}
+            </div>
+
+            <div class="panel" style="margin-top:14px;">
+                <h2>Hlavní rozvojové souvislosti obce</h2>
+                ${comparisonDiagnosticsHtml(mainProps, compareProps, function(props) {
+                    return uniqueDiagnostics(buildCrossDomainDiagnostics(props)).slice(0, 8);
+                })}
+            </div>
+
+            ${comparisonAgeStructureHtml(mainProps, compareProps)}
+
+            <div class="panel" style="margin-top:14px;">
+                <h2>Surové hodnoty vybrané oblasti</h2>
+                ${comparisonRawTableHtml(mainProps, compareProps)}
+            </div>
+
+            <div class="grid-3" id="comparison_charts_grid"></div>
+        </div>
+    `;
+
+    renderComparisonCharts(mainProps, compareProps);
+}
+
+function renderSelectedDashboardState() {
+    if (!selectedMunicipalityLayer) return;
+
+    const mainProps = selectedMunicipalityLayer.feature.properties;
+
+    if (compareMunicipalityLayer) {
+        renderComparisonDashboard(mainProps, compareMunicipalityLayer.feature.properties);
+        return;
+    }
+
+    setCompareLayoutActive(false);
+    updateDashboard(mainProps, "main");
+    destroyCharts("compare");
+    destroyCharts("comparison");
 }
 
 function readUrlState() {
@@ -4622,11 +5423,11 @@ function applyUrlControlState(state) {
 
     let groupId = state.indicator_group;
 
-    if (!indicatorGroups[groupId] && state.indicator) {
+    if (!validIndicatorGroupId(groupId) && state.indicator) {
         groupId = groupIdForIndicator(state.indicator);
     }
 
-    if (!indicatorGroups[groupId]) {
+    if (!validIndicatorGroupId(groupId)) {
         groupId = "waste";
     }
 
@@ -4635,7 +5436,10 @@ function applyUrlControlState(state) {
 
     if (
         state.indicator &&
-        indicatorGroups[groupId].indicators.includes(state.indicator) &&
+        (
+            groupId === ALL_GROUPS_DASHBOARD_ID ||
+            indicatorGroups[groupId].indicators.includes(state.indicator)
+        ) &&
         selectHasValue(indicatorSelect, state.indicator)
     ) {
         indicatorSelect.value = state.indicator;
@@ -4643,6 +5447,8 @@ function applyUrlControlState(state) {
 
     if (selectHasValue(yearSelect, state.year)) {
         yearSelect.value = state.year;
+    } else if (groupId === ALL_GROUPS_DASHBOARD_ID) {
+        yearSelect.value = "2024";
     } else {
         yearSelect.value = indicatorGroups[groupId].defaultYear || "2024";
     }
@@ -4719,9 +5525,8 @@ function selectedMunicipalityFilePart(layer) {
 
     const props = layer.feature.properties;
     const name = props.obec || "obec";
-    const code = props.kod_obce || "";
 
-    return (name + "_" + code)
+    return name
         .normalize("NFD")
         .replace(/[\\u0300-\\u036f]/g, "")
         .replace(/[^a-zA-Z0-9]+/g, "_")
@@ -4809,7 +5614,11 @@ function initializeDashboard() {
     document.getElementById("indicator_group").addEventListener("change", function() {
         const group = indicatorGroups[this.value] || indicatorGroups.waste;
         fillIndicatorSelectForGroup(this.value);
-        document.getElementById("year_select").value = group.defaultYear || "2024";
+        if (this.value === ALL_GROUPS_DASHBOARD_ID) {
+            document.getElementById("year_select").value = "2024";
+        } else {
+            document.getElementById("year_select").value = group.defaultYear || "2024";
+        }
         updateMap(true);
         updateUrlFromState();
     });
@@ -4860,7 +5669,7 @@ function initializeDashboard() {
     }
 
     if (compareMunicipalityLayer) {
-        fitBoundsToSelectedLayers();
+        fitComparisonMapIfNeeded();
     }
 
     suppressUrlUpdates = false;
