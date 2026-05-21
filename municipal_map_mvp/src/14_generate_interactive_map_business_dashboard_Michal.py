@@ -1,0 +1,6833 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+14_generate_interactive_map_business_dashboard_Kuba.py
+
+Interaktivní datová mapa obcí ČR s rozvojovým dashboardem.
+
+Hlavní logika:
+- mapa zobrazuje konkrétní ukazatel, ne kompozitní index,
+- výchozí oblast je Odpadové hospodářství,
+- ukazatele jsou seskupené do oblastí,
+- trendová tabulka ukazuje jen vybranou oblast,
+- grafy ukazují jen vybranou oblast,
+- u odpadů se používá období 2021–2023,
+- u ČSÚ ukazatelů období 2020–2024,
+- u krajiny se jako trend ukazuje hlavně koeficient ekologické stability,
+- katastrální / land-use ukazatele se zobrazují jako statický profil území,
+- věková struktura se zobrazuje jen pro oblast Demografie a věková struktura,
+- priority pro starostu se neduplikují s hlavními rozvojovými souvislostmi,
+- KES je interpretován podle prahů používaných v Mozaice UR,
+- pro živou ukázku lze zrychlit mapu přes FAST_DEMO_MODE,
+- zoom mapy je ovládaný přes + / - nebo Command/Ctrl/Alt + kolečko.
+
+Vstupy:
+    data/geo/municipalities.geojson
+    data/processed/dimension_scores.csv
+    data/processed/municipality_indicators_raw.csv
+    data/processed/municipality_indicators_trends_wide.csv
+    data/processed/age_structure_trends_wide.csv
+    data/processed/waste_indicators_trends_wide.csv
+
+Výstup:
+    outputs/interactive_map_business_dashboard_Kuba.html
+
+Spuštění:
+    python municipal_map_mvp/src/14_generate_interactive_map_business_dashboard_Kuba.py
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pandas as pd
+
+try:
+    import geopandas as gpd
+except ImportError as exc:
+    raise ImportError(
+        "Chybí geopandas. Nainstaluj například:\n"
+        "conda install geopandas\n"
+        "nebo:\n"
+        "pip install geopandas"
+    ) from exc
+
+
+# =============================================================================
+# CESTY
+# =============================================================================
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+DATA_DIR = PROJECT_ROOT / "data"
+GEO_DIR = DATA_DIR / "geo"
+PROCESSED_DIR = DATA_DIR / "processed"
+OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+
+GEOJSON_PATH = GEO_DIR / "municipalities.geojson"
+
+SCORES_PATH = PROCESSED_DIR / "dimension_scores.csv"
+RAW_INDICATORS_PATH = PROCESSED_DIR / "municipality_indicators_raw.csv"
+TRENDS_PATH = PROCESSED_DIR / "municipality_indicators_trends_wide.csv"
+AGE_TRENDS_PATH = PROCESSED_DIR / "age_structure_trends_wide.csv"
+WASTE_TRENDS_PATH = PROCESSED_DIR / "waste_indicators_trends_wide.csv"
+
+OUTPUT_PATH = OUTPUTS_DIR / "interactive_map_business_dashboard_Kuba_methodology_v9.html"
+
+
+# =============================================================================
+# REŽIM PRO ŽIVOU UKÁZKU
+# =============================================================================
+
+# True = menší a rychlejší HTML pro prezentaci.
+# False = plná přesnost hranic obcí.
+FAST_DEMO_MODE = True
+
+# Zjednodušení hranic v metrech.
+# Doporučení:
+# - 60 m = přesnější, stále rychlé
+# - 100 m = dobrý kompromis pro živou ukázku
+# - 150 m = nejrychlejší, hrubší hranice
+GEOMETRY_SIMPLIFY_TOLERANCE_METERS = 100
+
+
+# =============================================================================
+# DEFINICE UKAZATELŮ
+# =============================================================================
+
+MAP_INDICATORS = {
+    "population": {
+        "label": "Počet obyvatel",
+        "unit": "obyvatel",
+        "digits": 0,
+        "direction": "CONTEXT",
+        "description": "Velikost obce podle počtu obyvatel.",
+        "requires_population": False,
+    },
+    "migration_balance_per_1000": {
+        "label": "Migrační saldo / 1000 obyvatel",
+        "unit": "",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Kladná hodnota znamená, že se do obce více lidí přistěhovalo, než se odstěhovalo.",
+        "requires_population": True,
+    },
+    "natural_increase": {
+        "label": "Přirozený přírůstek / úbytek",
+        "unit": "osob",
+        "digits": 0,
+        "direction": "UP",
+        "description": "Rozdíl mezi počtem narozených a zemřelých.",
+        "requires_population": True,
+    },
+    "unemployment_rate": {
+        "label": "Podíl nezaměstnaných osob",
+        "unit": "%",
+        "digits": 2,
+        "direction": "DOWN",
+        "description": "Nižší hodnota obvykle znamená příznivější situaci na trhu práce.",
+        "requires_population": True,
+    },
+    "completed_flats_per_1000": {
+        "label": "Dokončené byty / 1000 obyvatel",
+        "unit": "",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Intenzita bytové výstavby v přepočtu na velikost obce.",
+        "requires_population": True,
+    },
+    "children_share": {
+        "label": "Podíl dětí 0–14",
+        "unit": "%",
+        "digits": 2,
+        "direction": "CONTEXT",
+        "description": "Podíl dětské složky populace.",
+        "requires_population": True,
+    },
+    "working_age_share": {
+        "label": "Podíl obyvatel 15–64",
+        "unit": "%",
+        "digits": 2,
+        "direction": "CONTEXT",
+        "description": "Podíl obyvatel v produktivním věku.",
+        "requires_population": True,
+    },
+    "senior_share": {
+        "label": "Podíl seniorů 65+",
+        "unit": "%",
+        "digits": 2,
+        "direction": "CONTEXT",
+        "description": "Podíl seniorské složky populace.",
+        "requires_population": True,
+    },
+    "ageing_index": {
+        "label": "Index stáří",
+        "unit": "",
+        "digits": 2,
+        "direction": "DOWN",
+        "description": "Počet seniorů 65+ na 100 dětí 0–14.",
+        "requires_population": True,
+    },
+    "average_age": {
+        "label": "Průměrný věk",
+        "unit": "roku",
+        "digits": 1,
+        "direction": "DOWN",
+        "description": "Průměrný věk obyvatel obce.",
+        "requires_population": True,
+    },
+    "waste_sorting_target_share": {
+        "label": "Plnění cíle třídění",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Vyšší hodnota znamená lepší plnění cíle třídění komunálních odpadů.",
+        "requires_population": False,
+    },
+    "municipal_waste_kg_per_capita": {
+        "label": "Komunální odpad / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "DOWN",
+        "description": "Produkce komunálního odpadu v kg na obyvatele. Nižší hodnota je obecně příznivější, ale musí se kontrolovat skladba odpadu.",
+        "requires_population": True,
+    },
+    "mixed_municipal_waste_kg_per_capita": {
+        "label": "Směsný komunální odpad / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "DOWN",
+        "description": "Produkce směsného komunálního odpadu v kg na obyvatele. Nižší hodnota je příznivější.",
+        "requires_population": True,
+    },
+    "bulky_waste_kg_per_capita": {
+        "label": "Objemný odpad / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "DOWN",
+        "description": "Produkce objemného odpadu v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "separated_recyclables_kg_per_capita": {
+        "label": "Separované recyklovatelné složky / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Množství separovaných recyklovatelných složek v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "plastic_separation_kg_per_capita": {
+        "label": "Separace plastu / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Množství vytříděného plastu v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "paper_separation_kg_per_capita": {
+        "label": "Separace papíru / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Množství vytříděného papíru v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "glass_separation_kg_per_capita": {
+        "label": "Separace skla / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Množství vytříděného skla v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "metal_separation_kg_per_capita": {
+        "label": "Separace kovů / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Množství vytříděných kovů v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "separation_efficiency_ppsk": {
+        "label": "Účinnost separace papír+plast+sklo+kov",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Účinnost separace souhrnu papíru, plastu, skla a kovů. Je to hlavní indikátor kvality třídění.",
+        "requires_population": False,
+    },
+    "paper_separation_efficiency": {
+        "label": "Účinnost separace papíru",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Vyšší hodnota znamená lepší účinnost separace papíru.",
+        "requires_population": False,
+    },
+    "glass_separation_efficiency": {
+        "label": "Účinnost separace skla",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Vyšší hodnota znamená lepší účinnost separace skla.",
+        "requires_population": False,
+    },
+    "metal_separation_efficiency": {
+        "label": "Účinnost separace kovů",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Vyšší hodnota znamená lepší účinnost separace kovů.",
+        "requires_population": False,
+    },
+    "plastic_separation_efficiency": {
+        "label": "Účinnost separace plastu",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Vyšší hodnota znamená lepší účinnost separace plastu.",
+        "requires_population": False,
+    },
+    "bio_waste_kg_per_capita": {
+        "label": "Bioodpad / obyv.",
+        "unit": "kg/obyv.",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Množství bioodpadu v kg na obyvatele.",
+        "requires_population": True,
+    },
+    "ecological_stability_coef": {
+        "label": "Koeficient ekologické stability",
+        "unit": "",
+        "digits": 4,
+        "direction": "UP",
+        "description": "Poměr ekologicky příznivých ploch vůči plochám zatěžujícím životní prostředí.",
+        "requires_population": False,
+    },
+    "municipality_area_km2": {
+        "label": "Výměra obce",
+        "unit": "km²",
+        "digits": 2,
+        "direction": "CONTEXT",
+        "description": "Celková výměra území obce.",
+        "requires_population": False,
+    },
+    "population_density_per_km2": {
+        "label": "Hustota obyvatel",
+        "unit": "obyv./km²",
+        "digits": 1,
+        "direction": "CONTEXT",
+        "description": "Počet obyvatel na km² území obce.",
+        "requires_population": True,
+    },
+    "built_up_area_share": {
+        "label": "Podíl zastavěných ploch",
+        "unit": "%",
+        "digits": 2,
+        "direction": "DOWN",
+        "description": "Podíl zastavěných ploch na výměře obce.",
+        "requires_population": False,
+    },
+    "arable_land_share": {
+        "label": "Podíl orné půdy",
+        "unit": "%",
+        "digits": 2,
+        "direction": "CONTEXT",
+        "description": "Podíl orné půdy na výměře obce.",
+        "requires_population": False,
+    },
+    "forest_land_share": {
+        "label": "Podíl lesní půdy",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Podíl lesní půdy na výměře obce.",
+        "requires_population": False,
+    },
+    "permanent_grassland_share": {
+        "label": "Podíl trvalých travních porostů",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Podíl trvalých travních porostů na výměře obce.",
+        "requires_population": False,
+    },
+    "water_area_share": {
+        "label": "Podíl vodních ploch",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Podíl vodních ploch na výměře obce.",
+        "requires_population": False,
+    },
+    "agricultural_land_share": {
+        "label": "Podíl zemědělské půdy",
+        "unit": "%",
+        "digits": 2,
+        "direction": "CONTEXT",
+        "description": "Podíl zemědělské půdy na výměře obce.",
+        "requires_population": False,
+    },
+    "natural_stable_area_share": {
+        "label": "Přírodně stabilnější plochy",
+        "unit": "%",
+        "digits": 2,
+        "direction": "UP",
+        "description": "Součet lesní půdy, trvalých travních porostů a vodních ploch na výměře obce.",
+        "requires_population": False,
+    },
+    "intensive_land_use_share": {
+        "label": "Intenzivně využívané plochy",
+        "unit": "%",
+        "digits": 2,
+        "direction": "DOWN",
+        "description": "Součet orné půdy a zastavěných ploch na výměře obce.",
+        "requires_population": False,
+    },
+}
+
+RAW_INDICATORS = [
+    "migration_balance_per_1000",
+    "natural_increase",
+    "unemployment_rate",
+    "completed_flats_per_1000",
+    "completed_flats_estimated",
+    "average_age",
+    "children_count",
+    "working_age_count",
+    "senior_count",
+    "children_share",
+    "working_age_share",
+    "senior_share",
+    "ageing_index",
+    "children_share_change_2024_2020",
+    "working_age_share_change_2024_2020",
+    "senior_share_change_2024_2020",
+    "ageing_index_change_2024_2020",
+    "waste_sorting_target_share",
+    "municipal_waste_kg_per_capita",
+    "mixed_municipal_waste_kg_per_capita",
+    "bulky_waste_kg_per_capita",
+    "separated_recyclables_kg_per_capita",
+    "paper_separation_kg_per_capita",
+    "plastic_separation_kg_per_capita",
+    "glass_separation_kg_per_capita",
+    "metal_separation_kg_per_capita",
+    "separation_efficiency_ppsk",
+    "paper_separation_efficiency",
+    "plastic_separation_efficiency",
+    "glass_separation_efficiency",
+    "metal_separation_efficiency",
+    "bio_waste_kg_per_capita",
+    "ecological_stability_coef",
+    "municipality_area_ha",
+    "municipality_area_km2",
+    "population_for_density",
+    "population_density_per_km2",
+    "agricultural_land_ha",
+    "agricultural_land_share",
+    "arable_land_ha",
+    "arable_land_share",
+    "forest_land_ha",
+    "forest_land_share",
+    "permanent_grassland_ha",
+    "permanent_grassland_share",
+    "water_area_ha",
+    "water_area_share",
+    "built_up_area_ha",
+    "built_up_area_share",
+    "other_area_ha",
+    "other_area_share",
+    "natural_stable_area_share",
+    "intensive_land_use_share",
+]
+
+TREND_INDICATORS = [
+    "population",
+    "migration_balance_per_1000",
+    "natural_increase",
+    "unemployment_rate",
+    "completed_flats_per_1000",
+    "completed_flats_estimated",
+    "ecological_stability_coef",
+    "average_age",
+    "children_share",
+    "working_age_share",
+    "senior_share",
+    "ageing_index",
+]
+
+WASTE_INDICATORS = [
+    "waste_sorting_target_share",
+    "municipal_waste_kg_per_capita",
+    "mixed_municipal_waste_kg_per_capita",
+    "bulky_waste_kg_per_capita",
+    "separated_recyclables_kg_per_capita",
+    "paper_separation_kg_per_capita",
+    "plastic_separation_kg_per_capita",
+    "glass_separation_kg_per_capita",
+    "metal_separation_kg_per_capita",
+    "separation_efficiency_ppsk",
+    "paper_separation_efficiency",
+    "plastic_separation_efficiency",
+    "glass_separation_efficiency",
+    "metal_separation_efficiency",
+    "bio_waste_kg_per_capita",
+]
+
+LAND_USE_INDICATORS = [
+    "municipality_area_km2",
+    "population_density_per_km2",
+    "built_up_area_share",
+    "arable_land_share",
+    "forest_land_share",
+    "permanent_grassland_share",
+    "water_area_share",
+    "agricultural_land_share",
+    "natural_stable_area_share",
+    "intensive_land_use_share",
+]
+
+AGE_TREND_PREFIXES = [
+    "children",
+    "working_age",
+    "seniors",
+    "children_share",
+    "working_age_share",
+    "senior_share",
+    "ageing_index",
+]
+
+POSSIBLE_GEO_CODE_COLUMNS = [
+    "kod_obce",
+    "KOD_OBCE",
+    "kod_obec",
+    "KOD_OBEC",
+    "kod_obec_p",
+    "KOD_OBEC_P",
+    "koduzemi",
+    "KODUZEMI",
+    "kod_uzemi",
+    "KOD_UZEMI",
+    "zuj",
+    "ZUJ",
+]
+
+
+# =============================================================================
+# POMOCNÉ FUNKCE
+# =============================================================================
+
+def clean_code(value) -> str:
+    if pd.isna(value):
+        return ""
+    return str(value).strip().replace(".0", "")
+
+
+def read_csv_smart(path: Path) -> pd.DataFrame:
+    last_error = None
+
+    for enc in ["utf-8-sig", "utf-8", "cp1250", "windows-1250", "latin-1"]:
+        try:
+            return pd.read_csv(path, encoding=enc, low_memory=False)
+        except Exception as exc:
+            last_error = exc
+
+    raise RuntimeError(f"Nepodařilo se načíst {path}: {last_error}")
+
+
+def find_geo_code_column(gdf: gpd.GeoDataFrame) -> str:
+    for col in POSSIBLE_GEO_CODE_COLUMNS:
+        if col in gdf.columns:
+            return col
+
+    raise ValueError(
+        "V geodatech se nepodařilo najít sloupec s kódem obce.\n"
+        f"Dostupné sloupce: {list(gdf.columns)}"
+    )
+
+
+def require_input_files() -> None:
+    required = [
+        GEOJSON_PATH,
+        SCORES_PATH,
+        RAW_INDICATORS_PATH,
+        TRENDS_PATH,
+        AGE_TRENDS_PATH,
+    ]
+
+    missing = [path for path in required if not path.exists()]
+
+    if missing:
+        msg = "\n".join(str(p) for p in missing)
+        raise FileNotFoundError(
+            "Chybí vstupní soubory:\n"
+            f"{msg}\n\n"
+            "Nejdřív spusť hlavní kroky:\n"
+            "python municipal_map_mvp/src/pipeline_core_scripts_02_06.py indicators\n"
+            "python municipal_map_mvp/src/13_build_indicator_trends.py\n"
+            "python municipal_map_mvp/src/15_add_age_structure.py\n"
+            "python municipal_map_mvp/src/17_apply_methodology_updates.py\n"
+            "python municipal_map_mvp/src/19_download_visoh2_waste.py\n"
+            "python municipal_map_mvp/src/20_add_land_use_environment.py"
+        )
+
+
+def safe_numeric_columns(df: pd.DataFrame, skip_cols: set[str]) -> pd.DataFrame:
+    out = df.copy()
+
+    for col in out.columns:
+        if col in skip_cols:
+            continue
+
+        out[col] = pd.to_numeric(out[col], errors="coerce")
+
+    return out
+
+
+# =============================================================================
+# PŘÍPRAVA DAT
+# =============================================================================
+
+def prepare_data() -> gpd.GeoDataFrame:
+    require_input_files()
+
+    print("[INFO] Načítám geodata...")
+    gdf = gpd.read_file(GEOJSON_PATH)
+
+    if gdf.crs is None:
+        print("[WARN] GeoJSON nemá CRS. Nastavuji EPSG:4326.")
+        gdf = gdf.set_crs("EPSG:4326")
+    elif str(gdf.crs).lower() not in ["epsg:4326", "wgs84"]:
+        gdf = gdf.to_crs("EPSG:4326")
+
+    code_col = find_geo_code_column(gdf)
+    gdf["kod_obce"] = gdf[code_col].map(clean_code)
+
+    print("[INFO] Načítám identitu obcí a benchmarky...")
+    scores = read_csv_smart(SCORES_PATH)
+    scores["kod_obce"] = scores["kod_obce"].map(clean_code)
+
+    score_keep_cols = [
+        "kod_obce",
+        "obec",
+        "okres",
+        "orp",
+        "population",
+        "size_category",
+        "size_category_final",
+        "settlement_type",
+        "volatility_warning",
+    ]
+    scores = scores[[c for c in score_keep_cols if c in scores.columns]].copy()
+    scores = safe_numeric_columns(
+        scores,
+        skip_cols={
+            "kod_obce",
+            "obec",
+            "okres",
+            "orp",
+            "size_category",
+            "size_category_final",
+            "settlement_type",
+            "volatility_warning",
+        },
+    )
+
+    print("[INFO] Načítám surové indikátory...")
+    raw = read_csv_smart(RAW_INDICATORS_PATH)
+    raw["kod_obce"] = raw["kod_obce"].map(clean_code)
+
+    raw_keep_cols = ["kod_obce", *RAW_INDICATORS]
+    raw = raw[[c for c in raw_keep_cols if c in raw.columns]].copy()
+    raw = safe_numeric_columns(raw, skip_cols={"kod_obce"})
+
+    if "completed_flats_estimated" not in raw.columns:
+        if "completed_flats_per_1000" in raw.columns and "population" in scores.columns:
+            tmp = scores[["kod_obce", "population"]].merge(raw, on="kod_obce", how="left")
+            tmp["completed_flats_estimated"] = (
+                pd.to_numeric(tmp["completed_flats_per_1000"], errors="coerce")
+                * pd.to_numeric(tmp["population"], errors="coerce")
+                / 1000
+            )
+            raw = raw.merge(
+                tmp[["kod_obce", "completed_flats_estimated"]],
+                on="kod_obce",
+                how="left",
+            )
+
+    print("[INFO] Načítám trendovou tabulku indikátorů...")
+    trends = read_csv_smart(TRENDS_PATH)
+    trends["kod_obce"] = trends["kod_obce"].map(clean_code)
+
+    trend_cols = [
+        c for c in trends.columns
+        if c == "kod_obce"
+        or any(c.startswith(f"{ind}_") for ind in TREND_INDICATORS)
+    ]
+    trends = trends[trend_cols].copy()
+    trends = safe_numeric_columns(
+        trends,
+        skip_cols={
+            "kod_obce",
+            *[
+                c for c in trends.columns
+                if c.endswith("_trend_2020_2024") or c.endswith("_trend_20_24")
+            ],
+        },
+    )
+
+    print("[INFO] Načítám věkovou strukturu 2020–2024...")
+    age = read_csv_smart(AGE_TRENDS_PATH)
+    age["kod_obce"] = age["kod_obce"].map(clean_code)
+
+    age_cols = [
+        c for c in age.columns
+        if c == "kod_obce"
+        or any(c.startswith(f"{prefix}_") for prefix in AGE_TREND_PREFIXES)
+    ]
+    age = age[age_cols].copy()
+    age = safe_numeric_columns(age, skip_cols={"kod_obce"})
+
+    print("[INFO] Načítám odpadové ukazatele VISOH2...")
+    waste = pd.DataFrame({"kod_obce": []})
+
+    if WASTE_TRENDS_PATH.exists():
+        waste = read_csv_smart(WASTE_TRENDS_PATH)
+        waste["kod_obce"] = waste["kod_obce"].map(clean_code)
+
+        waste_cols = [
+            c for c in waste.columns
+            if c == "kod_obce"
+            or c in ["waste_data_first_year", "waste_data_latest_year"]
+            or c in WASTE_INDICATORS
+            or any(c.startswith(f"{ind}_") for ind in WASTE_INDICATORS)
+        ]
+        waste = waste[waste_cols].copy()
+        waste = safe_numeric_columns(
+            waste,
+            skip_cols={
+                "kod_obce",
+                *[c for c in waste.columns if "_trend_" in c],
+            },
+        )
+    else:
+        print(f"[WARN] Chybí {WASTE_TRENDS_PATH}, odpadové trendy přeskočeny.")
+
+    print("[INFO] Spojuji identitu, surové hodnoty, trendy, věkovou strukturu a odpady...")
+    data = scores.merge(raw, on="kod_obce", how="left")
+    data = data.merge(trends, on="kod_obce", how="left")
+    data = data.merge(age, on="kod_obce", how="left")
+
+    if not waste.empty:
+        overlapping = [c for c in waste.columns if c != "kod_obce" and c in data.columns]
+        if overlapping:
+            data = data.drop(columns=overlapping)
+
+        data = data.merge(waste, on="kod_obce", how="left")
+
+    for indicator in MAP_INDICATORS:
+        if indicator not in data.columns and f"{indicator}_2024" in data.columns:
+            data[indicator] = data[f"{indicator}_2024"]
+
+    print("[INFO] Spojuji geometrii s daty...")
+    merged = gdf.merge(data, on="kod_obce", how="left")
+
+    matched = merged["population"].notna().sum() if "population" in merged.columns else 0
+    total = len(merged)
+    print(f"[INFO] Spojeno: {matched}/{total} obcí má základní data.")
+
+    base_cols = [
+        "kod_obce",
+        "obec",
+        "okres",
+        "orp",
+        "population",
+        "size_category",
+        "size_category_final",
+        "settlement_type",
+        "volatility_warning",
+        *MAP_INDICATORS.keys(),
+        *RAW_INDICATORS,
+    ]
+
+    dynamic_trend_cols = [
+        c for c in merged.columns
+        if any(c.startswith(f"{ind}_") for ind in TREND_INDICATORS)
+        or any(c.startswith(f"{prefix}_") for prefix in AGE_TREND_PREFIXES)
+        or any(c.startswith(f"{ind}_") for ind in WASTE_INDICATORS)
+        or c in ["waste_data_first_year", "waste_data_latest_year"]
+    ]
+
+    output_cols = []
+    for col in [*base_cols, *dynamic_trend_cols, "geometry"]:
+        if col in merged.columns and col not in output_cols:
+            output_cols.append(col)
+
+    merged = merged[output_cols].copy()
+
+    if FAST_DEMO_MODE:
+        print(
+            "[INFO] FAST_DEMO_MODE=True: zjednodušuji geometrii pro rychlejší živou ukázku "
+            f"({GEOMETRY_SIMPLIFY_TOLERANCE_METERS} m)."
+        )
+
+        original_crs = merged.crs
+
+        merged_projected = merged.to_crs("EPSG:3857")
+        merged_projected["geometry"] = merged_projected.geometry.simplify(
+            tolerance=GEOMETRY_SIMPLIFY_TOLERANCE_METERS,
+            preserve_topology=True,
+        )
+
+        merged = merged_projected.to_crs(original_crs)
+
+    return merged
+
+
+# =============================================================================
+# HTML
+# =============================================================================
+
+def generate_html(gdf: gpd.GeoDataFrame) -> str:
+    print("[INFO] Převádím data do GeoJSON pro HTML...")
+
+    gdf = gdf.copy()
+    gdf = gdf.to_crs("EPSG:4326")
+    gdf = gdf.where(pd.notnull(gdf), None)
+
+    geojson_data = json.loads(gdf.to_json())
+
+    geojson_json = json.dumps(
+        geojson_data,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+    indicator_meta_json = json.dumps(
+        MAP_INDICATORS,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+    html_template = """<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<title>Datový briefing obce pro nové vedení</title>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+html, body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.top-toolbar {
+    background: #ffffff;
+    border-bottom: 1px solid #d8dee4;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    padding: 12px 18px;
+    position: relative;
+    z-index: 1000;
+}
+
+.toolbar-inner {
+    max-width: 1640px;
+    margin: 0 auto;
+}
+
+.toolbar-title {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.toolbar-title h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.toolbar-title p {
+    margin: 0;
+    color: #586069;
+    font-size: 13px;
+}
+
+.toolbar-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(220px, 1.4fr)
+        minmax(220px, 1.4fr)
+        minmax(160px, 0.9fr)
+        minmax(180px, 1fr)
+        minmax(190px, 1fr)
+        minmax(115px, 0.6fr)
+        minmax(135px, auto);
+    gap: 10px;
+    align-items: end;
+}
+
+.toolbar-field {
+    min-width: 0;
+}
+
+.toolbar-field label {
+    display: block;
+    margin: 0 0 4px 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #24292f;
+}
+
+.toolbar-field select,
+.toolbar-field input {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 34px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    border: 1px solid #c9d1d9;
+    background: #ffffff;
+    font-size: 13px;
+}
+
+.input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+}
+
+.compare-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.top-toolbar button {
+    width: auto;
+    min-height: 34px;
+    margin-top: 0;
+    padding: 7px 10px;
+    border-radius: 7px;
+    border: 1px solid #c9d1d9;
+    background: #f6f8fa;
+    color: #24292f;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.top-toolbar button:hover {
+    background: #eef2f6;
+}
+
+.report-button {
+    background: #0f766e !important;
+    border-color: #0f766e !important;
+    color: #ffffff !important;
+}
+
+.toolbar-status {
+    min-height: 18px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #586069;
+}
+
+.map-shell {
+    position: relative;
+    height: 62vh;
+    min-height: 430px;
+    width: 100%;
+}
+
+.leaflet-control-zoom {
+    border: 1px solid #999 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25) !important;
+}
+
+.leaflet-control-zoom a {
+    width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+}
+
+.zoom-hint {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    z-index: 700;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 9px;
+    font-size: 12px;
+    color: #444;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+}
+
+.small-note {
+    font-size: 12px;
+    color: #555;
+    margin-top: 8px;
+    line-height: 1.35;
+}
+
+.legend {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    z-index: 700;
+    background: white;
+    border: 1px solid #999;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.25);
+    min-width: 230px;
+}
+
+.legend i {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+}
+
+.legend.collapsed {
+    min-width: auto;
+    width: 52px;
+    height: 48px;
+    overflow: hidden;
+    padding: 8px;
+}
+
+.legend-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.legend-toggle {
+    width: 32px;
+    min-width: 32px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    background: #eeeeee;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.legend.collapsed .legend-content,
+.legend.collapsed #legend_indicator_name,
+.legend.collapsed .legend-header b {
+    display: none;
+}
+
+.legend.collapsed .legend-header {
+    justify-content: center;
+}
+
+button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 7px;
+    cursor: pointer;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+.tooltip-note {
+    font-size: 12px;
+    color: #555;
+}
+
+.dashboard {
+    padding: 18px 24px 30px 24px;
+    background: #f5f5f5;
+}
+
+.dashboard-inner {
+    max-width: 1640px;
+    margin: 0 auto;
+}
+
+.dashboard-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+}
+
+.dashboard-columns.is-comparing {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+.municipality-dashboard {
+    min-width: 0;
+}
+
+.municipality-dashboard[hidden] {
+    display: none !important;
+}
+
+.dashboard-columns.is-comparing .dashboard-title h1 {
+    font-size: 20px;
+}
+
+.dashboard-columns.is-comparing .cards {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+}
+
+.dashboard-columns.is-comparing .grid-2,
+.dashboard-columns.is-comparing .grid-3,
+.dashboard-columns.is-comparing .all-groups-grid,
+.dashboard-columns.is-comparing .land-profile-grid {
+    grid-template-columns: 1fr;
+}
+
+.dashboard-columns.is-paired-comparison {
+    grid-template-columns: 1fr;
+}
+
+.comparison-dashboard {
+    min-width: 0;
+}
+
+.comparison-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.comparison-pair.compact {
+    gap: 8px;
+}
+
+.comparison-side {
+    min-width: 0;
+    border-left: 4px solid #111111;
+    padding-left: 10px;
+}
+
+.comparison-side.compare {
+    border-left-color: #d97706;
+}
+
+.comparison-side h3 {
+    font-size: 15px;
+    margin: 0 0 6px 0;
+}
+
+.comparison-value {
+    font-size: 22px;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.comparison-metric-card {
+    min-width: 0;
+}
+
+.comparison-metric-card .label {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.comparison-table th,
+.comparison-table td {
+    vertical-align: top;
+}
+
+.comparison-chart-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.comparison-chart-side {
+    min-width: 0;
+}
+
+.comparison-chart-side h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+}
+
+.comparison-all-groups-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.dashboard-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.dashboard-title h1 {
+    font-size: 23px;
+    margin: 0 0 6px 0;
+}
+
+.dashboard-title p {
+    margin: 0;
+    color: #555;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    border: 1px solid #e0e0e0;
+}
+
+.card .label {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.card .value {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.card .sub {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.panel {
+    background: white;
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    border: 1px solid #e0e0e0;
+}
+
+.panel h2 {
+    font-size: 17px;
+    margin: 0 0 10px 0;
+}
+
+.panel p {
+    line-height: 1.45;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+}
+
+th, td {
+    border-bottom: 1px solid #eee;
+    padding: 6px 5px;
+    text-align: right;
+}
+
+th:first-child,
+td:first-child {
+    text-align: left;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #eee;
+    margin-right: 4px;
+    white-space: nowrap;
+}
+
+.badge-good {
+    background: #e5f5e0;
+    color: #006d2c;
+}
+
+.badge-bad {
+    background: #fee0d2;
+    color: #a50f15;
+}
+
+.badge-neutral {
+    background: #eeeeee;
+    color: #444;
+}
+
+.warning-box {
+    background: #fff3cd;
+    border: 1px solid #ffe08a;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0 0 0;
+    color: #6b5200;
+    font-size: 13px;
+}
+
+.waste-methodology-box {
+    background: #f8fafc;
+    border: 1px solid #d8dee4;
+    border-radius: 8px;
+    padding: 12px;
+    line-height: 1.45;
+}
+
+.waste-state-label {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.waste-state-positive { background: #e5f5e0; color: #006d2c; }
+.waste-state-neutral { background: #eeeeee; color: #444; }
+.waste-state-mixed { background: #fff3cd; color: #6b5200; }
+.waste-state-warning { background: #fee8c8; color: #8a4b00; }
+.waste-state-negative { background: #fee0d2; color: #a50f15; }
+.waste-state-data { background: #eeeeee; color: #444; }
+
+.waste-logic-list {
+    margin: 8px 0 0 0;
+    padding-left: 18px;
+}
+
+.waste-logic-list li {
+    margin-bottom: 4px;
+}
+
+.waste-reference-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.waste-reference-card {
+    background: #ffffff;
+    border: 1px solid #d8e4f2;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.waste-reference-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+}
+
+.waste-reference-card table {
+    font-size: 12px;
+    border: 1px solid #e6edf5;
+    border-radius: 8px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.waste-reference-card th {
+    background: #f6f8fb;
+    color: #475569;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.waste-reference-card td,
+.waste-reference-card th {
+    padding: 7px 8px;
+    border-bottom: 1px solid #e6edf5;
+}
+
+.waste-reference-card tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.waste-reference-card td:last-child {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.waste-reading-legend {
+    margin-top: 12px;
+    background: #ffffff;
+    border: 1px solid #d8e4f2;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.waste-reading-legend h3 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+}
+
+.waste-reading-intro {
+    margin: 0 0 10px 0;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.waste-reading-list {
+    display: grid;
+    gap: 8px;
+}
+
+.waste-reading-item {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid #e6edf5;
+    border-radius: 10px;
+    background: #fbfdff;
+}
+
+.waste-reading-term {
+    color: #0f766e;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.waste-reading-text {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #334155;
+}
+
+.waste-reading-text b {
+    color: #0f172a;
+}
+
+@media (max-width: 820px) {
+    .waste-reference-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .waste-reading-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
+
+.age-bar {
+    display: flex;
+    width: 100%;
+    height: 28px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    margin: 10px 0;
+}
+
+.age-segment {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #111;
+    white-space: nowrap;
+}
+
+.age-children {
+    background: #c7e9c0;
+}
+
+.age-working {
+    background: #c6dbef;
+}
+
+.age-seniors {
+    background: #fdd0a2;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    border: 1px solid #e0e0e0;
+    min-height: 260px;
+}
+
+.chart-card h3 {
+    font-size: 15px;
+    margin: 0 0 8px 0;
+}
+
+.chart-wrap {
+    height: 210px;
+}
+
+.all-groups-dashboard {
+    margin-top: 18px;
+}
+
+.all-groups-header {
+    margin-bottom: 12px;
+}
+
+.all-groups-header h2 {
+    font-size: 19px;
+    margin: 0 0 6px 0;
+}
+
+.all-groups-header p {
+    margin: 0;
+    color: #555;
+    line-height: 1.45;
+}
+
+.all-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(360px, 1fr));
+    gap: 14px;
+}
+
+.group-dashboard-card {
+    background: white;
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    border: 1px solid #e0e0e0;
+}
+
+.group-dashboard-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.group-dashboard-top h3 {
+    font-size: 16px;
+    margin: 0 0 4px 0;
+}
+
+.group-dashboard-summary {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.45;
+    margin-bottom: 12px;
+}
+
+.group-signal-list {
+    display: grid;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.group-signal-row {
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) auto auto;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 5px;
+}
+
+.group-chart-wrap {
+    height: 240px;
+}
+
+.diagnostic-item {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.diagnostic-item:last-child {
+    border-bottom: 0;
+}
+
+.diagnostic-text {
+    margin-top: 6px;
+    line-height: 1.45;
+}
+
+.onboarding-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.onboarding-card {
+    border: 1px solid #d8e4f2;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fbfdff;
+}
+
+.onboarding-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.onboarding-agenda {
+    font-size: 12px;
+    font-weight: 800;
+    color: #0f766e;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.onboarding-question {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    line-height: 1.25;
+}
+
+.onboarding-section {
+    margin-top: 8px;
+    line-height: 1.45;
+}
+
+.onboarding-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 2px;
+}
+
+.onboarding-evidence {
+    margin: 6px 0 0 0;
+    padding-left: 18px;
+}
+
+.onboarding-evidence li {
+    margin: 2px 0;
+}
+
+.additional-signals-details {
+    border: 1px solid #e6edf5;
+    border-radius: 10px;
+    background: #fbfdff;
+    padding: 10px 12px;
+}
+
+.additional-signals-details summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: #334155;
+}
+
+@media (max-width: 1100px) {
+    .onboarding-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.land-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.land-profile-bars {
+    display: grid;
+    gap: 9px;
+}
+
+.land-bar-row {
+    display: grid;
+    grid-template-columns: 190px 1fr 72px;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+}
+
+.land-bar-outer {
+    background: #eee;
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.land-bar-inner {
+    height: 100%;
+    background: #74a9cf;
+}
+
+.land-summary-box {
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    line-height: 1.45;
+}
+
+@media (max-width: 1320px) {
+    .toolbar-grid {
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+    }
+
+    .toolbar-actions {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 1250px) {
+    .dashboard-columns.is-comparing {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1100px) {
+    .cards {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+    }
+
+    .grid-2,
+    .grid-3,
+    .all-groups-grid,
+    .land-profile-grid,
+    .comparison-pair,
+    .comparison-chart-pair {
+        grid-template-columns: 1fr;
+    }
+
+    .group-signal-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 820px) {
+    .top-toolbar {
+        padding: 10px 12px;
+    }
+
+    .toolbar-title {
+        display: block;
+    }
+
+    .toolbar-title h1 {
+        margin-bottom: 2px;
+    }
+
+    .toolbar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar-actions {
+        grid-column: auto;
+        flex-wrap: wrap;
+    }
+
+    .input-row,
+    .compare-row {
+        grid-template-columns: 1fr;
+    }
+
+    .map-shell {
+        height: 56vh;
+        min-height: 360px;
+    }
+
+    .legend {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        min-width: 0;
+    }
+
+    .zoom-hint {
+        left: 12px;
+        right: auto;
+        top: 12px;
+    }
+
+    .dashboard {
+        padding: 14px 12px 24px 12px;
+    }
+}
+
+@media print {
+    .top-toolbar,
+    .map-shell {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff;
+    }
+
+    .dashboard {
+        padding: 0;
+        background: #ffffff;
+    }
+
+    .panel,
+    .card,
+    .chart-card,
+    .group-dashboard-card {
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+</style>
+</head>
+
+<body>
+<header class="top-toolbar" id="control_panel">
+    <div class="toolbar-inner">
+        <div class="toolbar-title">
+            <h1>Datový briefing obce pro nové vedení</h1>
+            <p>Rychlá orientace po volbách: obyvatelé, rozvoj, odpady, území a první otázky pro radu obce</p>
+        </div>
+
+        <div class="toolbar-grid">
+            <div class="toolbar-field">
+                <label for="municipality_search">Hlavní obec</label>
+                <div class="input-row">
+                    <input
+                        id="municipality_search"
+                        list="municipality_list"
+                        placeholder="Název nebo kód obce"
+                    >
+                    <button onclick="zoomToMunicipality()">Najít</button>
+                </div>
+            </div>
+
+            <div class="toolbar-field">
+                <label for="compare_municipality_search">Porovnat s obcí</label>
+                <div class="input-row compare-row">
+                    <input
+                        id="compare_municipality_search"
+                        list="municipality_list"
+                        placeholder="Volitelně druhá obec"
+                    >
+                    <button onclick="selectCompareMunicipality()">Porovnat</button>
+                    <button onclick="clearCompareMunicipality()">Zrušit</button>
+                </div>
+            </div>
+
+            <div class="toolbar-field">
+                <label for="size_filter">Velikostní benchmark</label>
+                <select id="size_filter">
+                    <option value="ALL">Všechny benchmarky</option>
+                </select>
+            </div>
+
+            <div class="toolbar-field">
+                <label for="indicator_group">Oblast ukazatelů</label>
+                <select id="indicator_group">
+                    <option value="waste" selected>Odpadové hospodářství</option>
+                    <option value="demography">Demografie a věková struktura</option>
+                    <option value="labour">Práce a sociálně-ekonomická situace</option>
+                    <option value="housing">Bydlení a výstavba</option>
+                    <option value="environment">Krajina a životní prostředí</option>
+                    <option value="all_dashboard">Dashboard všech ukazatelů</option>
+                </select>
+            </div>
+
+            <div class="toolbar-field">
+                <label for="mode">Zobrazit ukazatel</label>
+                <select id="mode"></select>
+            </div>
+
+            <div class="toolbar-field">
+                <label for="year_select">Rok / období dat</label>
+                <select id="year_select">
+                    <option value="2024">2024</option>
+                    <option value="2023" selected>2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                </select>
+            </div>
+
+            <div class="toolbar-actions">
+                <button class="report-button" onclick="downloadReport()">Stáhnout report</button>
+            </div>
+        </div>
+
+        <div id="search_status" class="toolbar-status">
+            Barva mapy je počítána z vybraného ukazatele relativně vůči podobně velkým obcím.
+        </div>
+    </div>
+</header>
+
+<datalist id="municipality_list"></datalist>
+
+<div class="map-shell">
+    <div id="map"></div>
+    <div class="zoom-hint">Zoom: + / − nebo Command/Ctrl/Alt + kolečko</div>
+
+    <div class="legend" id="legend_panel">
+        <div class="legend-header">
+            <div>
+                <b>Barevná škála ukazatele</b><br>
+                <span id="legend_indicator_name"></span>
+            </div>
+            <button
+                class="legend-toggle"
+                id="legend_toggle"
+                onclick="toggleLegendPanel()"
+                title="Sbalit / rozbalit legendu"
+            >›</button>
+        </div>
+
+        <div class="legend-content" id="legend_content">
+            <span id="legend_range" class="small-note"></span><br><br>
+            <span id="legend_rows"></span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard">
+    <div class="dashboard-inner" id="dashboard_report_area">
+        <div class="dashboard-columns" id="dashboard_columns">
+            <section class="municipality-dashboard" id="dashboard_main"></section>
+            <section class="municipality-dashboard compare-dashboard" id="dashboard_compare" hidden></section>
+        </div>
+    </div>
+</div>
+
+<script>
+const geoData = __GEOJSON_DATA__;
+const indicatorMeta = __INDICATOR_META__;
+
+const allYears = [2020, 2021, 2022, 2023, 2024];
+const wasteYears = [2021, 2022, 2023];
+
+const indicatorGroups = {
+    waste: {
+        label: "Odpadové hospodářství",
+        subtitle: "VISOH2, období 2021–2023",
+        defaultYear: "2023",
+        indicators: [
+            "waste_sorting_target_share",
+            "municipal_waste_kg_per_capita",
+            "mixed_municipal_waste_kg_per_capita",
+            "bulky_waste_kg_per_capita",
+            "separated_recyclables_kg_per_capita",
+            "paper_separation_kg_per_capita",
+            "plastic_separation_kg_per_capita",
+            "glass_separation_kg_per_capita",
+            "metal_separation_kg_per_capita",
+            "separation_efficiency_ppsk",
+            "paper_separation_efficiency",
+            "plastic_separation_efficiency",
+            "glass_separation_efficiency",
+            "metal_separation_efficiency",
+            "bio_waste_kg_per_capita"
+        ]
+    },
+    demography: {
+        label: "Demografie a věková struktura",
+        subtitle: "ČSÚ, období 2020–2024",
+        defaultYear: "2024",
+        indicators: [
+            "population",
+            "migration_balance_per_1000",
+            "natural_increase",
+            "children_share",
+            "working_age_share",
+            "senior_share",
+            "ageing_index",
+            "average_age"
+        ]
+    },
+    labour: {
+        label: "Práce a sociálně-ekonomická situace",
+        subtitle: "ČSÚ, období 2020–2024",
+        defaultYear: "2024",
+        indicators: [
+            "unemployment_rate"
+        ]
+    },
+    housing: {
+        label: "Bydlení a výstavba",
+        subtitle: "ČSÚ, období 2020–2024",
+        defaultYear: "2024",
+        indicators: [
+            "completed_flats_per_1000"
+        ]
+    },
+    environment: {
+        label: "Krajina a životní prostředí",
+        subtitle: "ČSÚ/MOS a ČÚZK, poslední dostupný rok, typicky 2024",
+        defaultYear: "2024",
+        indicators: [
+            "ecological_stability_coef",
+            "municipality_area_km2",
+            "population_density_per_km2",
+            "built_up_area_share",
+            "arable_land_share",
+            "forest_land_share",
+            "permanent_grassland_share",
+            "water_area_share",
+            "agricultural_land_share",
+            "natural_stable_area_share",
+            "intensive_land_use_share"
+        ],
+        trendIndicators: [
+            "ecological_stability_coef"
+        ],
+        profileIndicators: [
+            "municipality_area_km2",
+            "population_density_per_km2",
+            "built_up_area_share",
+            "arable_land_share",
+            "forest_land_share",
+            "permanent_grassland_share",
+            "water_area_share",
+            "agricultural_land_share",
+            "natural_stable_area_share",
+            "intensive_land_use_share"
+        ]
+    }
+};
+
+const landUseIndicators = [
+    "municipality_area_km2",
+    "population_density_per_km2",
+    "built_up_area_share",
+    "arable_land_share",
+    "forest_land_share",
+    "permanent_grassland_share",
+    "water_area_share",
+    "agricultural_land_share",
+    "natural_stable_area_share",
+    "intensive_land_use_share"
+];
+
+let charts = {};
+let chartSlots = {};
+let selectedMunicipalityLayer = null;
+let compareMunicipalityLayer = null;
+let suppressUrlUpdates = false;
+
+const ALL_GROUPS_DASHBOARD_ID = "all_dashboard";
+
+function dashboardId(baseId, slot = "main") {
+    return slot === "main" ? baseId : baseId + "__" + slot;
+}
+
+function dashboardEl(baseId, slot = "main") {
+    return document.getElementById(dashboardId(baseId, slot));
+}
+
+function dashboardShellHtml(slot) {
+    return `
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1 id="${dashboardId("dash_title", slot)}">Rozvojový přehled obce</h1>
+                <p id="${dashboardId("dash_subtitle", slot)}">Klikni na obec v mapě nebo ji najdi vyhledáváním.</p>
+                <div id="${dashboardId("dash_warning", slot)}"></div>
+            </div>
+            <div>
+                <span class="badge">konkrétní ukazatel</span>
+                <span class="badge">surová hodnota</span>
+                <span class="badge">období podle zdroje dat</span>
+                <span class="badge">pořadí v benchmarku</span>
+            </div>
+        </div>
+
+        <div class="cards" id="${dashboardId("score_cards", slot)}"></div>
+
+        <div class="grid-2">
+            <div class="panel">
+                <h2>Metodické vyhodnocení oblasti</h2>
+                <p id="${dashboardId("business_summary", slot)}">
+                    Po výběru obce zde bude stručná interpretace vybraného ukazatele.
+                </p>
+            </div>
+
+            <div class="panel">
+                <h2 id="${dashboardId("trend_table_title", slot)}">Trendy vybrané oblasti</h2>
+                <div id="${dashboardId("trend_table", slot)}"></div>
+            </div>
+        </div>
+
+        <div class="panel" id="${dashboardId("land_profile_panel", slot)}" style="margin-top:14px; display:none;">
+            <h2>Profil využití území</h2>
+            <div id="${dashboardId("land_profile_content", slot)}"></div>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+            <h2>První otázky pro nové vedení</h2>
+            <div class="small-note" style="margin-bottom:8px;">
+                Automaticky vybrané otázky z dostupných dat. Nejde o hotová rozhodnutí, ale o body,
+                které má nové vedení ověřit po převzetí obce. Výběr je celkový za obec a není závislý
+                na právě zvolené oblasti v mapě.
+            </div>
+            <div id="${dashboardId("mayor_priorities", slot)}"></div>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+            <h2>Další signály k ověření</h2>
+            <div class="small-note" style="margin-bottom:8px;">
+                Doplňkový detail z automatické diagnostiky. Slouží jako podklad pro další čtení dat,
+                ne jako hlavní seznam úkolů. Hlavní výstup pro vedení obce je sekce otázek výše.
+            </div>
+            <div id="${dashboardId("cross_domain_diagnostics", slot)}"></div>
+        </div>
+
+        <div class="grid-2" id="${dashboardId("aux_tables_grid", slot)}">
+            <div class="panel" id="${dashboardId("age_structure_wrapper", slot)}" style="display:none;">
+                <h2>Věková struktura obce</h2>
+                <div id="${dashboardId("age_structure_panel", slot)}"></div>
+            </div>
+
+            <div class="panel" id="${dashboardId("raw_table_wrapper", slot)}">
+                <h2 id="${dashboardId("raw_table_title", slot)}">Surové hodnoty vybrané oblasti</h2>
+                <div id="${dashboardId("raw_table", slot)}"></div>
+            </div>
+        </div>
+
+        <div class="grid-3" id="${dashboardId("charts_grid", slot)}"></div>
+    `;
+}
+
+function initializeDashboardShells() {
+    const main = document.getElementById("dashboard_main");
+    const compare = document.getElementById("dashboard_compare");
+
+    if (main) {
+        main.innerHTML = dashboardShellHtml("main");
+        main.dataset.dashboardMode = "single";
+    }
+    if (compare) {
+        compare.innerHTML = dashboardShellHtml("compare");
+        compare.dataset.dashboardMode = "single";
+    }
+}
+
+function setCompareLayoutActive(active, paired = false) {
+    const columns = document.getElementById("dashboard_columns");
+    const compare = document.getElementById("dashboard_compare");
+
+    if (columns) {
+        columns.classList.toggle("is-comparing", Boolean(active && !paired));
+        columns.classList.toggle("is-paired-comparison", Boolean(active && paired));
+    }
+    if (compare) compare.hidden = !active || paired;
+}
+
+function setStatus(message, isWarning = false) {
+    const status = document.getElementById("search_status");
+    if (!status) return;
+
+    status.innerHTML = message || "";
+    status.style.color = isWarning ? "#8a4b00" : "#586069";
+}
+
+function isAllGroupsDashboardSelected() {
+    return selectedIndicatorGroupId() === ALL_GROUPS_DASHBOARD_ID;
+}
+
+function validIndicatorGroupId(groupId) {
+    return groupId === ALL_GROUPS_DASHBOARD_ID || Boolean(indicatorGroups[groupId]);
+}
+
+function indicatorIdsForAllGroups() {
+    const seen = new Set();
+    const out = [];
+
+    Object.keys(indicatorGroups).forEach(function(groupId) {
+        indicatorGroups[groupId].indicators.forEach(function(indicatorId) {
+            if (indicatorMeta[indicatorId] && !seen.has(indicatorId)) {
+                seen.add(indicatorId);
+                out.push({
+                    id: indicatorId,
+                    label: indicatorGroups[groupId].label + " — " + (indicatorMeta[indicatorId].label || indicatorId)
+                });
+            }
+        });
+    });
+
+    return out;
+}
+
+function selectedIndicatorGroupId() {
+    const el = document.getElementById("indicator_group");
+    return el ? el.value : "waste";
+}
+
+function selectedIndicatorGroup() {
+    return indicatorGroups[selectedIndicatorGroupId()] || indicatorGroups.waste;
+}
+
+function isWasteIndicator(indicator) {
+    return indicatorGroups.waste.indicators.includes(indicator);
+}
+
+function isLandUseIndicator(indicator) {
+    return landUseIndicators.includes(indicator);
+}
+
+function fillIndicatorSelectForGroup(groupId) {
+    const select = document.getElementById("mode");
+    const group = indicatorGroups[groupId] || indicatorGroups.waste;
+
+    if (!select) return;
+
+    const previousValue = select.value;
+    select.innerHTML = "";
+
+    if (groupId === ALL_GROUPS_DASHBOARD_ID) {
+        indicatorIdsForAllGroups().forEach(function(item) {
+            const option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = item.label;
+            select.appendChild(option);
+        });
+
+        if (selectHasValue(select, previousValue)) {
+            select.value = previousValue;
+        }
+        return;
+    }
+
+    group.indicators.forEach(function(indicatorId) {
+        const meta = indicatorMeta[indicatorId];
+        if (!meta) return;
+
+        const option = document.createElement("option");
+        option.value = indicatorId;
+        option.textContent = meta.label;
+        select.appendChild(option);
+    });
+
+    if (selectHasValue(select, previousValue) && group.indicators.includes(previousValue)) {
+        select.value = previousValue;
+    }
+}
+
+function toggleLegendPanel() {
+    const panel = document.getElementById("legend_panel");
+    const button = document.getElementById("legend_toggle");
+
+    panel.classList.toggle("collapsed");
+
+    if (panel.classList.contains("collapsed")) {
+        button.innerHTML = "‹";
+        button.title = "Rozbalit legendu";
+    } else {
+        button.innerHTML = "›";
+        button.title = "Sbalit legendu";
+    }
+}
+
+function toggleControlPanel() {
+    const panel = document.getElementById("control_panel");
+    const button = document.getElementById("panel_toggle");
+
+    if (!panel || !button) return;
+
+    panel.classList.toggle("collapsed");
+
+    if (panel.classList.contains("collapsed")) {
+        button.innerHTML = "›";
+        button.title = "Rozbalit panel";
+    } else {
+        button.innerHTML = "‹";
+        button.title = "Sbalit panel";
+    }
+}
+
+function normalizeText(value) {
+    if (value === null || value === undefined) return "";
+
+    return String(value)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\\u0300-\\u036f]/g, "")
+        .trim();
+}
+
+function benchmarkCategory(properties) {
+    return properties.size_category_final || properties.size_category || "";
+}
+
+function settlementType(properties) {
+    return properties.settlement_type || "";
+}
+
+function settlementBenchmarkText(properties) {
+    const type = settlementType(properties);
+    const benchmark = benchmarkCategory(properties);
+    const benchmarkText = benchmark
+        ? (String(benchmark).includes("obyvatel") ? String(benchmark) : String(benchmark) + " obyvatel")
+        : "";
+
+    if (type && benchmarkText) {
+        return "Typ sídla: " + type + " (" + benchmarkText + ")";
+    }
+
+    if (type) {
+        return "Typ sídla: " + type;
+    }
+
+    if (benchmarkText) {
+        return "Velikost obce: " + benchmarkText;
+    }
+
+    return "Typ sídla: neuvedeno";
+}
+
+function hasValidPopulation(properties) {
+    const pop = Number(properties.population);
+    return !isNaN(pop) && pop > 0;
+}
+
+function indicatorRequiresPopulation(indicator) {
+    const meta = indicatorMeta[indicator] || {};
+    return Boolean(meta.requires_population);
+}
+
+function selectedIndicatorId() {
+    return document.getElementById("mode").value;
+}
+
+function selectedIndicatorMeta() {
+    return indicatorMeta[selectedIndicatorId()] || {};
+}
+
+function selectedYear() {
+    return document.getElementById("year_select").value;
+}
+
+function municipalityLabel(properties) {
+    const name = properties.obec || "Neznámá obec";
+    const okres = properties.okres || "";
+    return okres ? `${name} — ${okres}` : name;
+}
+
+function formatValue(value, digits = 2) {
+    if (value === null || value === undefined || value === "" || isNaN(Number(value))) return "bez dat";
+    return Number(value).toLocaleString("cs-CZ", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+    });
+}
+
+function signedValue(value, digits = 2) {
+    if (value === null || value === undefined || value === "" || isNaN(Number(value))) return "bez dat";
+    const number = Number(value);
+    const sign = number > 0 ? "+" : "";
+    return sign + number.toLocaleString("cs-CZ", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+    });
+}
+
+function formatIndicatorValue(value, meta) {
+    if (value === null || value === undefined || value === "" || isNaN(Number(value))) return "bez dat";
+
+    const digits = meta.digits ?? 2;
+    let out = Number(value).toLocaleString("cs-CZ", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+    });
+
+    if (meta.unit) {
+        out += " " + meta.unit;
+    }
+
+    return out;
+}
+
+function getIndicatorValueForYear(properties, indicator, year) {
+    if (indicatorRequiresPopulation(indicator) && !hasValidPopulation(properties)) {
+        return null;
+    }
+
+    if (isLandUseIndicator(indicator)) {
+        const latest = properties[indicator];
+        if (latest === null || latest === undefined || latest === "" || isNaN(Number(latest))) {
+            return null;
+        }
+        return Number(latest);
+    }
+
+    let value = properties[indicator + "_" + year];
+
+    if (value === null || value === undefined || value === "" || isNaN(Number(value))) {
+        if (isWasteIndicator(indicator)) {
+            return null;
+        }
+        value = properties[indicator];
+    }
+
+    if (value === null || value === undefined || value === "" || isNaN(Number(value))) {
+        if (!isWasteIndicator(indicator)) {
+            value = properties[indicator + "_2024"];
+        }
+    }
+
+    value = Number(value);
+
+    if (isNaN(value)) return null;
+
+    return value;
+}
+
+function getRawIndicatorValue(properties) {
+    return getIndicatorValueForYear(properties, selectedIndicatorId(), selectedYear());
+}
+
+function fillMunicipalitySearch() {
+    const datalist = document.getElementById("municipality_list");
+    if (!datalist) return;
+    datalist.innerHTML = "";
+
+    const items = geoData.features
+        .map(function(feature) {
+            return {
+                label: municipalityLabel(feature.properties),
+                name: feature.properties.obec || "",
+                code: feature.properties.kod_obce || "",
+                okres: feature.properties.okres || ""
+            };
+        })
+        .filter(function(item) {
+            return item.name !== "";
+        })
+        .sort(function(a, b) {
+            return a.label.localeCompare(b.label, "cs");
+        });
+
+    items.forEach(function(item) {
+        const option = document.createElement("option");
+        option.value = item.label;
+        datalist.appendChild(option);
+    });
+}
+
+function findMunicipalityFeature(query) {
+    const q = normalizeText(query);
+    const queryParts = String(query || "").split("—").map(function(part) {
+        return normalizeText(part);
+    });
+    const qNameOnly = queryParts[0] || "";
+    const qDistrictOnly = queryParts[1] || "";
+    const nameQuery = qNameOnly || q;
+
+    if (q === "") return null;
+
+    const codeMatch = String(query).match(/\\b\\d{6}\\b/);
+    const searchedCode = codeMatch ? codeMatch[0] : null;
+
+    if (searchedCode) {
+        const byCode = geoData.features.find(function(feature) {
+            return String(feature.properties.kod_obce) === searchedCode;
+        });
+
+        if (byCode) return byCode;
+    }
+
+    const exactName = geoData.features.find(function(feature) {
+        const nameMatches = normalizeText(feature.properties.obec) === nameQuery;
+        const districtMatches = !qDistrictOnly || normalizeText(feature.properties.okres) === qDistrictOnly;
+        return nameMatches && districtMatches;
+    });
+
+    if (exactName) return exactName;
+
+    const startsWithName = geoData.features.find(function(feature) {
+        return normalizeText(feature.properties.obec).startsWith(nameQuery);
+    });
+
+    if (startsWithName) return startsWithName;
+
+    const containsName = geoData.features.find(function(feature) {
+        return normalizeText(feature.properties.obec).includes(nameQuery);
+    });
+
+    if (containsName) return containsName;
+
+    return null;
+}
+
+function findMunicipalityFeatureByCode(code) {
+    if (code === null || code === undefined || String(code).trim() === "") return null;
+
+    return geoData.features.find(function(feature) {
+        return String(feature.properties.kod_obce) === String(code).trim();
+    }) || null;
+}
+
+function findLayerByFeature(feature) {
+    if (!feature || !feature.properties) return null;
+
+    let foundLayer = null;
+    const code = String(feature.properties.kod_obce);
+
+    geoLayer.eachLayer(function(layer) {
+        if (
+            layer.feature &&
+            layer.feature.properties &&
+            String(layer.feature.properties.kod_obce) === code
+        ) {
+            foundLayer = layer;
+        }
+    });
+
+    return foundLayer;
+}
+
+function setMunicipalityInputValue(slot, properties) {
+    const inputId = slot === "compare" ? "compare_municipality_search" : "municipality_search";
+    const input = document.getElementById(inputId);
+    if (input && properties) {
+        input.value = municipalityLabel(properties);
+    }
+}
+
+function uniqueSizeCategories() {
+    const values = new Set();
+
+    geoData.features.forEach(function(feature) {
+        const cat = benchmarkCategory(feature.properties);
+        if (cat !== null && cat !== undefined && cat !== "") {
+            values.add(cat);
+        }
+    });
+
+    return Array.from(values).sort(function(a, b) {
+        return String(a).localeCompare(String(b), "cs", { numeric: true });
+    });
+}
+
+function fillSizeFilter() {
+    const select = document.getElementById("size_filter");
+    const categories = uniqueSizeCategories();
+
+    categories.forEach(function(cat) {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        select.appendChild(option);
+    });
+}
+
+function benchmarkFeaturesForProperties(properties) {
+    const cat = benchmarkCategory(properties);
+
+    if (!cat) return geoData.features;
+
+    return geoData.features.filter(function(feature) {
+        return benchmarkCategory(feature.properties) === cat;
+    });
+}
+
+function isFeatureInCurrentFilter(feature) {
+    const selectedCategory = document.getElementById("size_filter").value;
+
+    if (selectedCategory === "ALL") return true;
+
+    return benchmarkCategory(feature.properties) === selectedCategory;
+}
+
+function quantile(sortedValues, q) {
+    if (!sortedValues.length) return null;
+
+    const pos = (sortedValues.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+
+    if ((base + 1) < sortedValues.length) {
+        return sortedValues[base] + rest * (sortedValues[base + 1] - sortedValues[base]);
+    }
+
+    return sortedValues[base];
+}
+
+function selectedIndicatorValuesForBenchmark(properties) {
+    const indicator = selectedIndicatorId();
+    const year = selectedYear();
+    const features = benchmarkFeaturesForProperties(properties);
+
+    return features
+        .map(function(feature) {
+            return getIndicatorValueForYear(feature.properties, indicator, year);
+        })
+        .filter(function(value) {
+            return value !== null && value !== undefined && !isNaN(value);
+        })
+        .sort(function(a, b) {
+            return a - b;
+        });
+}
+
+function scaleStatsForProperties(properties) {
+    const values = selectedIndicatorValuesForBenchmark(properties);
+
+    if (values.length < 2) {
+        return {
+            values: values,
+            p05: null,
+            p95: null
+        };
+    }
+
+    return {
+        values: values,
+        p05: quantile(values, 0.05),
+        p95: quantile(values, 0.95)
+    };
+}
+
+function valueToColorScale(properties) {
+    const value = getRawIndicatorValue(properties);
+    if (value === null) return null;
+
+    const stats = scaleStatsForProperties(properties);
+    const p05 = stats.p05;
+    const p95 = stats.p95;
+
+    if (p05 === null || p95 === null || p05 === p95) return null;
+
+    const meta = selectedIndicatorMeta();
+
+    let clipped = Math.max(p05, Math.min(p95, value));
+    let scale = 100 * (clipped - p05) / (p95 - p05);
+
+    if (meta.direction === "DOWN") {
+        scale = 100 - scale;
+    }
+
+    return scale;
+}
+
+function benchmarkSize(properties) {
+    return benchmarkFeaturesForProperties(properties).length;
+}
+
+function benchmarkWarningText(properties) {
+    const n = benchmarkSize(properties);
+
+    if (n < 10) {
+        return "Benchmark obsahuje jen " + n + " obcí. Srovnání je pouze orientační.";
+    }
+
+    if (n < 30) {
+        return "Benchmark obsahuje " + n + " obcí. Srovnání interpretuj opatrně.";
+    }
+
+    return "";
+}
+
+function benchmarkRankInfo(properties) {
+    const indicator = selectedIndicatorId();
+    const meta = selectedIndicatorMeta();
+    const year = selectedYear();
+    const value = getRawIndicatorValue(properties);
+
+    if (value === null || value === undefined || isNaN(value)) {
+        return {
+            rank: null,
+            total: 0,
+            text: "bez dat"
+        };
+    }
+
+    const features = benchmarkFeaturesForProperties(properties);
+
+    let values = features
+        .map(function(feature) {
+            return getIndicatorValueForYear(feature.properties, indicator, year);
+        })
+        .filter(function(v) {
+            return v !== null && v !== undefined && !isNaN(v);
+        });
+
+    const total = values.length;
+
+    if (total === 0) {
+        return {
+            rank: null,
+            total: 0,
+            text: "bez dat"
+        };
+    }
+
+    if (meta.direction === "DOWN") {
+        values.sort(function(a, b) { return a - b; });
+    } else {
+        values.sort(function(a, b) { return b - a; });
+    }
+
+    if (meta.direction === "CONTEXT") {
+        values.sort(function(a, b) { return b - a; });
+    }
+
+    let rank = values.findIndex(function(v) {
+        return Math.abs(v - value) < 0.000001;
+    });
+
+    if (rank < 0) {
+        return {
+            rank: null,
+            total: total,
+            text: "bez dat"
+        };
+    }
+
+    rank = rank + 1;
+
+    let label = "";
+    if (meta.direction === "CONTEXT") {
+        label = "pořadí podle výše hodnoty";
+    } else {
+        label = "pořadí podle příznivosti";
+    }
+
+    return {
+        rank: rank,
+        total: total,
+        text: rank + ". z " + total + " — " + label
+    };
+}
+
+function benchmarkPositionText(properties) {
+    const scale = valueToColorScale(properties);
+    const meta = selectedIndicatorMeta();
+
+    if (scale === null || scale === undefined || isNaN(scale)) {
+        return "bez dat";
+    }
+
+    if (meta.direction === "CONTEXT") {
+        if (scale >= 80) return "vysoká hodnota";
+        if (scale >= 60) return "spíše vyšší hodnota";
+        if (scale >= 40) return "střední hodnota";
+        if (scale >= 20) return "spíše nižší hodnota";
+        return "nízká hodnota";
+    }
+
+    if (scale >= 80) return "příznivá hodnota";
+    if (scale >= 60) return "spíše příznivá hodnota";
+    if (scale >= 40) return "střední hodnota";
+    if (scale >= 20) return "spíše méně příznivá hodnota";
+    return "riziková hodnota";
+}
+
+const canvasRenderer = L.canvas({
+    padding: 0.5
+});
+
+const map = L.map("map", {
+    zoomControl: false,
+    preferCanvas: true,
+    renderer: canvasRenderer,
+    scrollWheelZoom: false,
+    wheelDebounceTime: 80,
+    wheelPxPerZoomLevel: 90
+}).setView([49.8, 15.5], 8);
+
+L.control.zoom({
+    position: "topright"
+}).addTo(map);
+
+L.control.scale({
+    position: "bottomright",
+    metric: true,
+    imperial: false
+}).addTo(map);
+
+let modifierWheelZoomActive = false;
+const mapContainer = map.getContainer();
+
+mapContainer.addEventListener("wheel", function(event) {
+    const modifierPressed = event.metaKey || event.ctrlKey || event.altKey;
+
+    if (modifierPressed) {
+        if (!modifierWheelZoomActive) {
+            map.scrollWheelZoom.enable();
+            modifierWheelZoomActive = true;
+        }
+    } else {
+        if (modifierWheelZoomActive) {
+            map.scrollWheelZoom.disable();
+            modifierWheelZoomActive = false;
+        }
+    }
+}, { passive: true });
+
+mapContainer.addEventListener("mouseleave", function() {
+    map.scrollWheelZoom.disable();
+    modifierWheelZoomActive = false;
+});
+
+window.addEventListener("keyup", function() {
+    map.scrollWheelZoom.disable();
+    modifierWheelZoomActive = false;
+});
+
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; OpenStreetMap &copy; CARTO",
+    subdomains: "abcd",
+    maxZoom: 19,
+    updateWhenIdle: true,
+    keepBuffer: 2
+}).addTo(map);
+
+function getColor(value) {
+    // Jednotná barevná škála pro všechny typy ukazatelů:
+    // vyšší skóre = lepší / příznivější / vyšší kontextová hodnota = zelená,
+    // nižší skóre = horší / méně příznivá / nižší kontextová hodnota = červená.
+    if (value === null || value === undefined || isNaN(value)) return "#d9d9d9";
+    value = Number(value);
+
+    if (value >= 80) return "#006837";
+    if (value >= 60) return "#31a354";
+    if (value >= 40) return "#addd8e";
+    if (value >= 20) return "#fdae6b";
+    return "#de2d26";
+}
+
+function styleFeature(feature) {
+    if (!isFeatureInCurrentFilter(feature)) {
+        return {
+            fillColor: "#eeeeee",
+            color: "#cccccc",
+            weight: 0.1,
+            fillOpacity: 0.08
+        };
+    }
+
+    const colorScale = valueToColorScale(feature.properties);
+
+    return {
+        fillColor: getColor(colorScale),
+        color: "#333333",
+        weight: 0.25,
+        fillOpacity: 0.75
+    };
+}
+
+function tooltipContent(properties) {
+    const meta = selectedIndicatorMeta();
+    const year = selectedYear();
+    const rawValue = getRawIndicatorValue(properties);
+    const colorScale = valueToColorScale(properties);
+    const warning = benchmarkWarningText(properties);
+    const rankInfo = benchmarkRankInfo(properties);
+
+    return `
+        <b>${properties.obec || "Neznámá obec"}</b><br>
+        Okres: ${properties.okres || ""}<br>
+        ORP: ${properties.orp || ""}<br>
+        Počet obyvatel: ${formatValue(properties.population, 0)}<br>
+        ${settlementBenchmarkText(properties)}<br>
+        <hr>
+        <b>${meta.label} (${year}): ${formatIndicatorValue(rawValue, meta)}</b><br>
+        Pořadí v benchmarku: ${rankInfo.text}<br>
+        Kontext benchmarku: ${benchmarkPositionText(properties)}<br>
+        Barevná škála: ${formatValue(colorScale, 1)} / 100<br>
+        ${warning ? "<br><span class='tooltip-note'>" + warning + "</span>" : ""}
+        <br><span class="tooltip-note">Barva je relativní vůči podobně velkým obcím. Hodnota výše je surový údaj.</span><br>
+    `;
+}
+
+let geoLayer = L.geoJSON(geoData, {
+    renderer: canvasRenderer,
+    style: styleFeature,
+    onEachFeature: function(feature, layer) {
+        layer.bindTooltip("", {
+            sticky: true
+        });
+
+        layer.on("tooltipopen", function() {
+            layer.setTooltipContent(tooltipContent(layer.feature.properties));
+        });
+
+        layer.on("mouseover", function() {
+            if (isFeatureInCurrentFilter(feature)) {
+                layer.setStyle({
+                    weight: 1.5,
+                    color: "#000000",
+                    fillOpacity: 0.9
+                });
+            }
+        });
+
+        layer.on("mouseout", function() {
+            if (isSelectedMunicipalityLayer(layer)) {
+                applySelectedLayerStyles();
+            } else {
+                geoLayer.resetStyle(layer);
+                applySelectedLayerStyles();
+            }
+        });
+
+        layer.on("click", function() {
+            selectMunicipalityLayer(layer, true);
+        });
+    }
+}).addTo(map);
+
+function setFilterToMunicipalityBenchmark(properties) {
+    const cat = benchmarkCategory(properties);
+    const select = document.getElementById("size_filter");
+
+    if (cat && select.value !== cat) {
+        select.value = cat;
+    }
+}
+
+function sameMunicipalityLayer(a, b) {
+    if (!a || !b || !a.feature || !b.feature) return false;
+    return String(a.feature.properties.kod_obce) === String(b.feature.properties.kod_obce);
+}
+
+function isSelectedMunicipalityLayer(layer) {
+    return selectedMunicipalityLayer === layer || compareMunicipalityLayer === layer;
+}
+
+function applySelectedLayerStyles() {
+    if (selectedMunicipalityLayer) {
+        selectedMunicipalityLayer.setStyle({
+            weight: 4,
+            color: "#111111",
+            fillOpacity: 0.98,
+            dashArray: null
+        });
+        if (selectedMunicipalityLayer.bringToFront) selectedMunicipalityLayer.bringToFront();
+    }
+
+    if (compareMunicipalityLayer) {
+        compareMunicipalityLayer.setStyle({
+            weight: 4,
+            color: "#d97706",
+            fillOpacity: 0.98,
+            dashArray: "8 4"
+        });
+        if (compareMunicipalityLayer.bringToFront) compareMunicipalityLayer.bringToFront();
+    }
+}
+
+function refreshSelectedDashboards() {
+    renderSelectedDashboardState();
+}
+
+function selectMunicipalityLayer(layer, setBenchmarkFilter = false, updateUrl = true) {
+    if (!layer || !layer.feature) return;
+
+    selectedMunicipalityLayer = layer;
+    setMunicipalityInputValue("main", layer.feature.properties);
+
+    if (compareMunicipalityLayer && sameMunicipalityLayer(selectedMunicipalityLayer, compareMunicipalityLayer)) {
+        clearCompareMunicipality(false, "Porovnávací obec byla stejná jako hlavní obec, proto byla odebrána.");
+    }
+
+    if (setBenchmarkFilter) {
+        setFilterToMunicipalityBenchmark(layer.feature.properties);
+    }
+
+    updateMap(false);
+    renderSelectedDashboardState();
+    fitComparisonMapIfNeeded();
+
+    if (updateUrl) {
+        updateUrlFromState();
+    }
+}
+
+function selectCompareLayer(layer, updateUrl = true, fitToSelection = true) {
+    if (!layer || !layer.feature) return false;
+
+    if (!selectedMunicipalityLayer) {
+        setStatus("Nejprve vyber hlavní obec, potom obec pro porovnání.", true);
+        return false;
+    }
+
+    if (sameMunicipalityLayer(selectedMunicipalityLayer, layer)) {
+        clearCompareMunicipality(updateUrl, "Porovnávací obec musí být jiná než hlavní obec.");
+        return false;
+    }
+
+    compareMunicipalityLayer = layer;
+    setMunicipalityInputValue("compare", layer.feature.properties);
+    updateMap(false);
+    renderSelectedDashboardState();
+
+    if (fitToSelection) {
+        fitComparisonMapIfNeeded();
+    }
+
+    if (updateUrl) {
+        updateUrlFromState();
+    }
+
+    return true;
+}
+
+function clearCompareMunicipality(updateUrl = true, message = "") {
+    compareMunicipalityLayer = null;
+    setCompareLayoutActive(false);
+    destroyCharts("compare");
+
+    const input = document.getElementById("compare_municipality_search");
+    if (input) input.value = "";
+
+    updateMap(false);
+    renderSelectedDashboardState();
+
+    if (message) {
+        setStatus(message, true);
+    } else if (updateUrl) {
+        setStatus("Porovnání bylo odebráno.");
+    }
+
+    if (updateUrl) {
+        updateUrlFromState();
+    }
+}
+
+function fitBoundsToSelectedLayers(layers = [selectedMunicipalityLayer, compareMunicipalityLayer].filter(Boolean)) {
+    if (!layers.length) return;
+
+    const group = L.featureGroup(layers);
+    map.fitBounds(group.getBounds(), {
+        maxZoom: 12,
+        padding: [24, 24]
+    });
+}
+
+function districtLayersForComparison() {
+    if (!selectedMunicipalityLayer || !compareMunicipalityLayer) return [];
+
+    const mainDistrict = selectedMunicipalityLayer.feature.properties.okres || "";
+    const compareDistrict = compareMunicipalityLayer.feature.properties.okres || "";
+
+    if (!mainDistrict || !compareDistrict || mainDistrict !== compareDistrict) {
+        return [];
+    }
+
+    const layers = [];
+    geoLayer.eachLayer(function(layer) {
+        if (
+            layer.feature &&
+            layer.feature.properties &&
+            layer.feature.properties.okres === mainDistrict
+        ) {
+            layers.push(layer);
+        }
+    });
+
+    return layers;
+}
+
+function fitComparisonMapIfNeeded() {
+    if (!selectedMunicipalityLayer || !compareMunicipalityLayer) return;
+
+    const districtLayers = districtLayersForComparison();
+
+    if (districtLayers.length) {
+        fitBoundsToSelectedLayers(districtLayers);
+        return;
+    }
+
+    fitBoundsToSelectedLayers();
+}
+
+function selectCompareMunicipality() {
+    const input = document.getElementById("compare_municipality_search");
+    const query = input ? input.value : "";
+    const feature = findMunicipalityFeature(query);
+
+    if (!feature) {
+        setStatus("Porovnávací obec nenalezena. Zkus název bez překlepu nebo šestimístný kód obce.", true);
+        return;
+    }
+
+    const foundLayer = findLayerByFeature(feature);
+
+    if (!foundLayer) {
+        setStatus("Porovnávací obec je v datech, ale nepodařilo se najít její geometrii.", true);
+        return;
+    }
+
+    if (selectCompareLayer(foundLayer, true, true)) {
+        setStatus(
+            "Porovnávám hlavní obec " +
+            (selectedMunicipalityLayer.feature.properties.obec || "") +
+            " s obcí " +
+            (foundLayer.feature.properties.obec || "") +
+            "."
+        );
+    }
+}
+
+function zoomToMunicipality() {
+    const input = document.getElementById("municipality_search");
+    const query = input ? input.value : "";
+
+    const feature = findMunicipalityFeature(query);
+
+    if (!feature) {
+        setStatus("Obec nenalezena. Zkus název bez překlepu nebo šestimístný kód obce.", true);
+        return;
+    }
+
+    const foundLayer = findLayerByFeature(feature);
+
+    if (!foundLayer) {
+        setStatus("Obec je v datech, ale nepodařilo se najít její geometrii.", true);
+        return;
+    }
+
+    selectMunicipalityLayer(foundLayer, true, true);
+
+    if (compareMunicipalityLayer) {
+        fitComparisonMapIfNeeded();
+    } else {
+        map.fitBounds(foundLayer.getBounds(), {
+            maxZoom: 12
+        });
+    }
+
+    foundLayer.setTooltipContent(tooltipContent(foundLayer.feature.properties));
+    foundLayer.openTooltip();
+
+    setStatus(
+        "Nalezena obec: " +
+        (feature.properties.obec || "") +
+        ", " +
+        settlementBenchmarkText(feature.properties).toLowerCase() +
+        "."
+    );
+}
+
+function updateLegend() {
+    const meta = selectedIndicatorMeta();
+
+    document.getElementById("legend_indicator_name").innerHTML = meta.label || "";
+
+    const rows = document.getElementById("legend_rows");
+
+    rows.innerHTML = `
+        <i style="background:#006837"></i>příznivá / vysoká hodnota<br>
+        <i style="background:#31a354"></i>spíše příznivá / vyšší<br>
+        <i style="background:#addd8e"></i>střední hodnota<br>
+        <i style="background:#fdae6b"></i>méně příznivá / nižší<br>
+        <i style="background:#de2d26"></i>riziková / nízká hodnota<br>
+        <i style="background:#d9d9d9"></i>bez dat / mimo filtr
+    `;
+
+    let interpretation = "";
+    if (meta.direction === "DOWN") {
+        interpretation = " U tohoto ukazatele je nižší surová hodnota považována za příznivější.";
+    } else if (meta.direction === "UP") {
+        interpretation = " U tohoto ukazatele je vyšší surová hodnota považována za příznivější.";
+    } else {
+        interpretation = " U kontextových ukazatelů zelená značí vyšší hodnotu v benchmarku, červená nižší hodnotu.";
+    }
+
+    document.getElementById("legend_range").innerHTML =
+        "Škála je počítána z 5.–95. percentilu v rámci benchmarku pro vybraný rok." + interpretation;
+}
+
+function updateMap(refreshDashboard = true) {
+    updateLegend();
+
+    geoLayer.eachLayer(function(layer) {
+        layer.setStyle(styleFeature(layer.feature));
+    });
+
+    applySelectedLayerStyles();
+
+    if (refreshDashboard) {
+        refreshSelectedDashboards();
+    }
+}
+
+function getDiffPeriod(props, indicator) {
+    return (
+        props[indicator + "_diff_2024_2020"] ??
+        props[indicator + "_change_2024_2020"] ??
+        props[indicator + "_change_24_20"] ??
+        props[indicator + "_diff_2023_2021"] ??
+        props[indicator + "_change_2023_2021"] ??
+        null
+    );
+}
+
+function getDiffYear(props, indicator) {
+    return (
+        props[indicator + "_diff_2024_2023"] ??
+        props[indicator + "_change_2024_2023"] ??
+        props[indicator + "_change_24_23"] ??
+        props[indicator + "_diff_2023_2022"] ??
+        props[indicator + "_change_2023_2022"] ??
+        null
+    );
+}
+
+function getTrend(props, indicator) {
+    if (isLandUseIndicator(indicator)) {
+        return "aktuální stav";
+    }
+
+    const explicitTrend =
+        props[indicator + "_trend_2020_2024"] ||
+        props[indicator + "_trend_20_24"] ||
+        props[indicator + "_trend_2021_2023"];
+
+    if (explicitTrend && explicitTrend !== "bez dat") {
+        return explicitTrend;
+    }
+
+    const meta = indicatorMeta[indicator] || {};
+
+    let startValue = null;
+    let endValue = null;
+
+    if (isWasteIndicator(indicator)) {
+        startValue = Number(props[indicator + "_2021"]);
+        endValue = Number(props[indicator + "_2023"]);
+    } else {
+        startValue = Number(props[indicator + "_2020"]);
+        endValue = Number(props[indicator + "_2024"]);
+    }
+
+    if (isNaN(startValue) || isNaN(endValue)) {
+        return "bez dat";
+    }
+
+    const diff = endValue - startValue;
+    const tolerance = Math.max(0.000001, Math.abs(startValue) * 0.001);
+
+    if (Math.abs(diff) <= tolerance) {
+        return "stabilní";
+    }
+
+    if (meta.direction === "CONTEXT") {
+        return diff > 0 ? "roste" : "klesá";
+    }
+
+    if (meta.direction === "DOWN") {
+        return diff < 0 ? "zlepšení" : "zhoršení";
+    }
+
+    if (meta.direction === "UP") {
+        return diff > 0 ? "zlepšení" : "zhoršení";
+    }
+
+    return diff > 0 ? "roste" : "klesá";
+}
+
+function trendBadge(trend) {
+    if (!trend || trend === "bez dat") {
+        return '<span class="badge badge-neutral">bez dat</span>';
+    }
+
+    if (trend === "zlepšení") {
+        return '<span class="badge badge-good">zlepšení</span>';
+    }
+
+    if (trend === "zhoršení") {
+        return '<span class="badge badge-bad">zhoršení</span>';
+    }
+
+    return '<span class="badge badge-neutral">' + trend + '</span>';
+}
+
+function createIndicatorCards(props, slot = "main") {
+    const container = dashboardEl("score_cards", slot);
+    if (!container) return;
+
+    if (selectedIndicatorGroupId() === "waste" || isWasteIndicator(selectedIndicatorId())) {
+        container.innerHTML = wasteMethodologyCardsHtml(props);
+        return;
+    }
+
+    const indicator = selectedIndicatorId();
+    const meta = selectedIndicatorMeta();
+    const year = selectedYear();
+
+    const rawValue = getRawIndicatorValue(props);
+    const diffPeriod = getDiffPeriod(props, indicator);
+    const rankInfo = benchmarkRankInfo(props);
+    const benchmarkText = benchmarkPositionText(props);
+
+    const diffText = isLandUseIndicator(indicator)
+        ? "statický / aktuální údaj"
+        : signedValue(diffPeriod, meta.digits ?? 2);
+
+    container.innerHTML = `
+        <div class="card">
+            <div class="label">Ukazatel</div>
+            <div class="value" style="font-size:18px">${meta.label}</div>
+            <div class="sub">${meta.description || ""}</div>
+        </div>
+        <div class="card">
+            <div class="label">Hodnota ${year}</div>
+            <div class="value">${formatIndicatorValue(rawValue, meta)}</div>
+            <div class="sub">surová hodnota ve vybraném roce nebo poslední dostupný údaj</div>
+        </div>
+        <div class="card">
+            <div class="label">Dlouhodobá změna</div>
+            <div class="value" style="font-size:${isLandUseIndicator(indicator) ? "17px" : "22px"}">${diffText}</div>
+            <div class="sub">v jednotce ukazatele</div>
+        </div>
+        <div class="card">
+            <div class="label">Pozice mezi podobnými obcemi</div>
+            <div class="value" style="font-size:18px">${rankInfo.text}</div>
+            <div class="sub">${benchmarkText}, ${settlementBenchmarkText(props).toLowerCase()}, rok ${year}</div>
+        </div>
+    `;
+}
+
+function currentValueForTrendTable(props, indicator) {
+    if (isWasteIndicator(indicator)) {
+        return props[indicator + "_2023"] ?? props[indicator];
+    }
+
+    if (isLandUseIndicator(indicator)) {
+        return props[indicator];
+    }
+
+    return props[indicator + "_2024"] ?? props[indicator];
+}
+
+function trendRowsForSelectedGroup() {
+    const group = selectedIndicatorGroup();
+    let periodNote = "";
+    let rows = [];
+
+    if (selectedIndicatorGroupId() === "environment") {
+        rows = ["ecological_stability_coef"];
+        periodNote = `
+            <div class="small-note" style="margin-bottom:10px">
+                U krajiny dává jako časový trend smysl především koeficient ekologické stability.
+                Katastrální ukazatele jako výměra, podíl orné půdy, lesů nebo vodních ploch jsou níže zobrazené jako statický profil území.
+            </div>
+        `;
+    } else if (group === indicatorGroups.waste) {
+        rows = group.indicators;
+        periodNote = `
+            <div class="small-note" style="margin-bottom:10px">
+                Odpadové ukazatele jsou z VISOH2. Aktuální hodnota odpovídá poslednímu dostupnému roku,
+                typicky 2023. Meziroční změna odpovídá období 2023–2022 a dlouhodobá změna období 2023–2021.
+                Jednotlivé řádky jsou důkazní data; závěr se počítá kombinovaně podle cíle, KO, SKO, PPSK a účinnosti separace.
+            </div>
+        `;
+    } else {
+        rows = group.indicators;
+        periodNote = `
+            <div class="small-note" style="margin-bottom:10px">
+                Ukazatele v této oblasti jsou zobrazeny pro období 2020–2024.
+            </div>
+        `;
+    }
+
+    return {
+        rows: rows,
+        periodNote: periodNote
+    };
+}
+
+function createTrendTable(props, slot = "main") {
+    const group = selectedIndicatorGroup();
+
+    const title = dashboardEl("trend_table_title", slot);
+    if (title) {
+        title.innerHTML = "Trendy: " + group.label;
+    }
+
+    function createIndicatorRow(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+        const label = meta.label || indicator;
+        const digits = meta.digits ?? 2;
+        const unit = meta.unit || "";
+
+        const current = currentValueForTrendTable(props, indicator);
+        const diffYear = isLandUseIndicator(indicator) ? null : getDiffYear(props, indicator);
+        const diffPeriod = isLandUseIndicator(indicator) ? null : getDiffPeriod(props, indicator);
+        const trend = getTrend(props, indicator);
+
+        let currentText = formatIndicatorValue(current, meta);
+
+        let diffYearText = isLandUseIndicator(indicator) ? "—" : signedValue(diffYear, digits);
+        if (diffYearText !== "bez dat" && diffYearText !== "—" && unit) {
+            diffYearText += " " + unit;
+        }
+
+        let diffPeriodText = isLandUseIndicator(indicator) ? "—" : signedValue(diffPeriod, digits);
+        if (diffPeriodText !== "bez dat" && diffPeriodText !== "—" && unit) {
+            diffPeriodText += " " + unit;
+        }
+
+        return `
+            <tr>
+                <td>${label}</td>
+                <td>${currentText}</td>
+                <td>${diffYearText}</td>
+                <td>${diffPeriodText}</td>
+                <td>${trendBadge(trend)}</td>
+            </tr>
+        `;
+    }
+
+    const rowConfig = trendRowsForSelectedGroup();
+    const rows = rowConfig.rows;
+    const periodNote = rowConfig.periodNote;
+
+    let html = `
+        <div style="margin-bottom:8px;">
+            <div style="font-weight:700; font-size:15px;">${group.label}</div>
+            <div class="small-note">${group.subtitle}</div>
+        </div>
+        ${periodNote}
+        <table>
+            <thead>
+                <tr>
+                    <th>Ukazatel</th>
+                    <th>Aktuálně</th>
+                    <th>Meziročně</th>
+                    <th>Dlouhodobě</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    rows.forEach(function(indicator) {
+        if (indicatorMeta[indicator]) {
+            html += createIndicatorRow(indicator);
+        }
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    const table = dashboardEl("trend_table", slot);
+    if (table) table.innerHTML = html;
+}
+
+function agePct(value) {
+    if (value === null || value === undefined || isNaN(value)) return 0;
+    return Math.max(0, Math.min(100, Number(value)));
+}
+
+function createAgeStructurePanel(props, slot = "main") {
+    const wrapper = dashboardEl("age_structure_wrapper", slot);
+    const panel = dashboardEl("age_structure_panel", slot);
+
+    if (!panel) return;
+
+    if (selectedIndicatorGroupId() !== "demography") {
+        if (wrapper) wrapper.style.display = "none";
+        if (panel) panel.innerHTML = "";
+        return;
+    }
+
+    if (wrapper) wrapper.style.display = "block";
+
+    if (!hasValidPopulation(props)) {
+        panel.innerHTML = `
+            <div class="warning-box">
+                Pro obec nejsou dostupná validní populační data. Věkovou strukturu nelze spolehlivě zobrazit.
+            </div>
+        `;
+        return;
+    }
+
+    const childrenCount = props.children_count ?? props.children_2024;
+    const workingCount = props.working_age_count ?? props.working_age_2024;
+    const seniorCount = props.senior_count ?? props.seniors_2024;
+
+    const childrenShare = props.children_share ?? props.children_share_2024;
+    const workingShare = props.working_age_share ?? props.working_age_share_2024;
+    const seniorShare = props.senior_share ?? props.senior_share_2024;
+
+    const ageingIndex = props.ageing_index ?? props.ageing_index_2024;
+
+    const childrenChange = props.children_share_change_2024_2020 ?? props.children_share_diff_2024_2020;
+    const workingChange = props.working_age_share_change_2024_2020 ?? props.working_age_share_diff_2024_2020;
+    const seniorChange = props.senior_share_change_2024_2020 ?? props.senior_share_diff_2024_2020;
+    const ageingChange = props.ageing_index_change_2024_2020 ?? props.ageing_index_diff_2024_2020;
+
+    const c = agePct(childrenShare);
+    const w = agePct(workingShare);
+    const s = agePct(seniorShare);
+
+    const html = `
+        <div class="age-bar">
+            <div class="age-segment age-children" style="width:${c}%">0–14</div>
+            <div class="age-segment age-working" style="width:${w}%">15–64</div>
+            <div class="age-segment age-seniors" style="width:${s}%">65+</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Skupina</th>
+                    <th>Počet</th>
+                    <th>Podíl 2024</th>
+                    <th>Dlouhodobá změna</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Děti 0–14</td>
+                    <td>${formatValue(childrenCount, 0)}</td>
+                    <td>${formatValue(childrenShare, 2)} %</td>
+                    <td>${signedValue(childrenChange, 2)} p. b.</td>
+                </tr>
+                <tr>
+                    <td>Produktivní věk 15–64</td>
+                    <td>${formatValue(workingCount, 0)}</td>
+                    <td>${formatValue(workingShare, 2)} %</td>
+                    <td>${signedValue(workingChange, 2)} p. b.</td>
+                </tr>
+                <tr>
+                    <td>Senioři 65+</td>
+                    <td>${formatValue(seniorCount, 0)}</td>
+                    <td>${formatValue(seniorShare, 2)} %</td>
+                    <td>${signedValue(seniorChange, 2)} p. b.</td>
+                </tr>
+                <tr>
+                    <td><b>Index stáří</b></td>
+                    <td colspan="2">${formatValue(ageingIndex, 2)} seniorů na 100 dětí</td>
+                    <td>${signedValue(ageingChange, 2)} bodu</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="small-note">
+            Index stáří = počet obyvatel 65+ / počet obyvatel 0–14 × 100.
+            Změny podílů jsou v procentních bodech.
+        </p>
+    `;
+
+    panel.innerHTML = html;
+}
+
+function createRawTable(props, slot = "main") {
+    const groupId = selectedIndicatorGroupId();
+    const group = selectedIndicatorGroup();
+    const wrapper = dashboardEl("raw_table_wrapper", slot);
+    const auxGrid = dashboardEl("aux_tables_grid", slot);
+    const table = dashboardEl("raw_table", slot);
+    const title = dashboardEl("raw_table_title", slot);
+
+    // U odpadového hospodářství se surové hodnoty v hlavním pohledu nezobrazují.
+    // Duplicitně kopírují tabulku "Trendy: Odpadové hospodářství", která je pro starostu užitečnější,
+    // protože ukazuje hodnoty napříč roky, ne jen poslední dostupný rok.
+    if (groupId === "waste") {
+        if (wrapper) wrapper.style.display = "none";
+        if (table) table.innerHTML = "";
+        if (auxGrid) auxGrid.style.display = "none";
+        return;
+    }
+
+    if (auxGrid) auxGrid.style.display = "grid";
+    if (wrapper) wrapper.style.display = "block";
+
+    if (title) {
+        title.innerHTML = "Surové hodnoty: " + group.label;
+    }
+
+    let html = "<table><tbody>";
+
+    group.indicators.forEach(function(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+
+        const value = rawTableValue(props, indicator);
+
+        html += `
+            <tr>
+                <td>${meta.label || indicator}</td>
+                <td>${formatIndicatorValue(value, meta)}</td>
+            </tr>
+        `;
+    });
+
+    html += "</tbody></table>";
+
+    if (table) table.innerHTML = html;
+}
+
+function rawTableValue(props, indicator) {
+    if (isWasteIndicator(indicator)) {
+        return props[indicator + "_2023"] ?? props[indicator];
+    }
+
+    if (isLandUseIndicator(indicator)) {
+        return props[indicator];
+    }
+
+    return props[indicator + "_2024"] ?? props[indicator];
+}
+
+
+function wasteValue(props, indicator, year) {
+    return propNumber(props, indicator + "_" + year) ?? propNumber(props, indicator);
+}
+
+function firstValidNumber(values) {
+    for (let i = 0; i < values.length; i += 1) {
+        const value = numOrNull(values[i]);
+        if (value !== null) return value;
+    }
+    return null;
+}
+
+function sumWasteComponents(props, year, componentIndicators) {
+    let total = 0;
+    let found = false;
+
+    componentIndicators.forEach(function(indicator) {
+        const value = wasteValue(props, indicator, year);
+        if (value !== null) {
+            total += value;
+            found = true;
+        }
+    });
+
+    return found ? total : null;
+}
+
+function averageWasteComponents(props, year, componentIndicators) {
+    let total = 0;
+    let count = 0;
+
+    componentIndicators.forEach(function(indicator) {
+        const value = wasteValue(props, indicator, year);
+        if (value !== null) {
+            total += value;
+            count += 1;
+        }
+    });
+
+    return count > 0 ? total / count : null;
+}
+
+function ppskSeparationValue(props, year) {
+    const componentSum = sumWasteComponents(props, year, [
+        "paper_separation_kg_per_capita",
+        "plastic_separation_kg_per_capita",
+        "glass_separation_kg_per_capita",
+        "metal_separation_kg_per_capita"
+    ]);
+
+    return componentSum ?? wasteValue(props, "separated_recyclables_kg_per_capita", year);
+}
+
+function ppskEfficiencyValue(props, year) {
+    return wasteValue(props, "separation_efficiency_ppsk", year) ?? averageWasteComponents(props, year, [
+        "paper_separation_efficiency",
+        "plastic_separation_efficiency",
+        "glass_separation_efficiency",
+        "metal_separation_efficiency"
+    ]);
+}
+
+function directionalChange(startValue, endValue, toleranceAbs = 0.05) {
+    if (startValue === null || endValue === null) return "missing";
+    const diff = endValue - startValue;
+    const tolerance = Math.max(toleranceAbs, Math.abs(startValue) * 0.005);
+    if (Math.abs(diff) <= tolerance) return "stable";
+    return diff > 0 ? "up" : "down";
+}
+
+function directionText(direction) {
+    if (direction === "up") return "roste";
+    if (direction === "down") return "klesá";
+    if (direction === "stable") return "drží se";
+    return "bez dat";
+}
+
+function wasteStateBadgeClass(state) {
+    if (state === "positive") return "waste-state-positive";
+    if (state === "mixed") return "waste-state-mixed";
+    if (state === "below_target_mixed") return "waste-state-mixed";
+    if (state === "near_target_improving") return "waste-state-warning";
+    if (state === "below_target_improving") return "waste-state-warning";
+    if (state === "warning") return "waste-state-warning";
+    if (state === "negative") return "waste-state-negative";
+    if (state === "data_check") return "waste-state-data";
+    return "waste-state-neutral";
+}
+
+function wasteStateLabel(state) {
+    if (state === "positive") return "Příznivý vývoj";
+    if (state === "mixed") return "Smíšený vývoj";
+    if (state === "below_target_mixed") return "Pod cílem — smíšený vývoj";
+    if (state === "near_target_improving") return "Těsně pod cílem — třídění se zlepšuje";
+    if (state === "below_target_improving") return "Pod cílem — třídění se zlepšuje";
+    if (state === "warning") return "Varovný signál";
+    if (state === "negative") return "Negativní vývoj";
+    if (state === "data_check") return "Zkontrolovat data";
+    return "Bez výrazné změny";
+}
+
+function wasteTargetForDiagnosticYear(year) {
+    // Pro historickou diagnózu používáme nejbližší zákonný milník: 60 % od roku 2025.
+    // Dashboard současně zobrazuje i další milníky 2030 a 2035 v metodickém textu.
+    if (Number(year) >= 2035) return 70;
+    if (Number(year) >= 2030) return 65;
+    return 60;
+}
+
+function wasteSystemAssessment(props) {
+    const ko2021 = wasteValue(props, "municipal_waste_kg_per_capita", 2021);
+    const ko2023 = wasteValue(props, "municipal_waste_kg_per_capita", 2023);
+    const sko2021 = wasteValue(props, "mixed_municipal_waste_kg_per_capita", 2021);
+    const sko2023 = wasteValue(props, "mixed_municipal_waste_kg_per_capita", 2023);
+    const sorting2021 = wasteValue(props, "waste_sorting_target_share", 2021);
+    const sorting2022 = wasteValue(props, "waste_sorting_target_share", 2022);
+    const sorting2023 = wasteValue(props, "waste_sorting_target_share", 2023);
+    const ppsk2021 = ppskSeparationValue(props, 2021);
+    const ppsk2023 = ppskSeparationValue(props, 2023);
+    const eff2021 = ppskEfficiencyValue(props, 2021);
+    const eff2023 = ppskEfficiencyValue(props, 2023);
+
+    const target = wasteTargetForDiagnosticYear(2025);
+    const koDir = directionalChange(ko2021, ko2023, 0.5);
+    const skoDir = directionalChange(sko2021, sko2023, 0.5);
+    const ppskDir = directionalChange(ppsk2021, ppsk2023, 0.2);
+    const effDir = directionalChange(eff2021, eff2023, 0.2);
+    const sortingDir = directionalChange(sorting2021, sorting2023, 0.2);
+
+    const required = [ko2021, ko2023, sko2021, sko2023, sorting2023, ppsk2021, ppsk2023, eff2021, eff2023];
+    const missingCount = required.filter(function(value) { return value === null; }).length;
+
+    const sortingBelowTarget = sorting2023 !== null && sorting2023 < target;
+    const sortingGap = sorting2023 === null ? null : sorting2023 - target;
+    const sortingNearTarget = sortingGap !== null && sortingGap < 0 && sortingGap >= -3;
+    const sortingWorseYear = sorting2022 !== null && sorting2023 !== null && (sorting2023 - sorting2022) < -0.2;
+    const sortingWorsePeriod = sortingDir === "down";
+    const koDown = koDir === "down";
+    const skoDown = skoDir === "down";
+    const koUp = koDir === "up";
+    const skoUp = skoDir === "up";
+    const ppskDown = ppskDir === "down";
+    const ppskUp = ppskDir === "up";
+    const effDown = effDir === "down";
+    const effUpOrStable = effDir === "up" || effDir === "stable";
+    const sortingUpOrStable = sortingDir === "up" || sortingDir === "stable";
+    const sortingSystemImproving = sortingBelowTarget && sortingUpOrStable && ppskUp && effUpOrStable && skoDown;
+
+    let state = "neutral";
+    let explanation = "Ukazatele nemají jednoznačný společný směr. Vývoj je potřeba číst v kombinaci, ne podle jednoho čísla.";
+
+    if (missingCount >= 4) {
+        state = "data_check";
+        explanation = "Chybí část klíčových odpadových hodnot. Než se z dashboardu udělá závěr, je potřeba zkontrolovat vstupní data.";
+    } else if (sortingBelowTarget && (sortingWorseYear || sortingWorsePeriod) && !skoDown) {
+        state = "negative";
+        explanation = "Obec je pod cílem třídění, plnění se zhoršuje a směsný odpad neklesá. To je nejsilnější varovná kombinace.";
+    } else if (koUp && skoUp && ppskDown && effDown) {
+        state = "negative";
+        explanation = "Roste celkový i směsný odpad, zatímco separace a účinnost klesají. To ukazuje na zhoršení odpadového systému.";
+    } else if (koDown && skoDown && ppskUp && effUpOrStable && sortingUpOrStable && !sortingBelowTarget) {
+        state = "positive";
+        explanation = "Klesá celkový i směsný odpad a třídění se zlepšuje nebo drží. To je metodicky příznivá kombinace.";
+    } else if (koDown && skoDown && (ppskDown || effDown || sortingWorseYear || sortingWorsePeriod || sortingBelowTarget)) {
+        state = sortingBelowTarget ? "below_target_mixed" : "mixed";
+        explanation = sortingBelowTarget
+            ? "Obec je pod cílem třídění. Celkový i směsný odpad sice klesají, ale cíl třídění nebo kvalita separace vyžadují kontrolu. Výsledek proto není čistě pozitivní."
+            : "Produkční ukazatele jsou příznivé, protože klesá celkový nebo směsný odpad, ale cíl třídění nebo kvalita separace vyžadují kontrolu. Výsledek proto není čistě pozitivní.";
+    } else if (sortingSystemImproving && sortingNearTarget) {
+        state = "near_target_improving";
+        explanation = "Obec je těsně pod cílem 60 %, ale třídění se v posledních oficiálních datech zlepšuje: PPSK a účinnost rostou a černá popelnice klesá. Hlavní kontrola je, zda se po roce 2023 podařilo cíl dotáhnout a zda neroste odpad celkem.";
+    } else if (sortingSystemImproving) {
+        state = "below_target_improving";
+        explanation = "Obec je pod cílem třídění, ale hlavní signály třídění jdou dobrým směrem: PPSK a účinnost rostou a směsný odpad klesá. Priorita není plošný zásah, ale ověření aktuálních dat 2024/2025 a dohled nad celkovou produkcí odpadu.";
+    } else if (sortingBelowTarget || effDown) {
+        state = "warning";
+        explanation = "Obec je pod cílem třídění nebo klesá účinnost separace. To je důvod pro kontrolu konkrétních složek a nastavení sběru.";
+    } else if (koDown && skoDown && ppskDown && effUpOrStable) {
+        state = "neutral";
+        explanation = "Separace klesá, ale zároveň klesá celkový i směsný odpad a účinnost se nezhoršuje. Pokles vytříděných kg tedy nemusí být sám o sobě problém.";
+    } else if (koUp && skoDown && ppskUp && effUpOrStable) {
+        state = "warning";
+        explanation = "Třídění se zlepšuje a směsný odpad klesá, ale celková produkce odpadu roste. To ukazuje spíš na slabší prevenci vzniku odpadu.";
+    }
+
+    const evidence = [
+        "Plnění cíle třídění: " + (sorting2023 === null ? "bez dat" : formatValue(sorting2023, 1) + " %") + ", trend 2021–2023: " + directionText(sortingDir),
+        "Komunální odpad celkem: " + directionText(koDir),
+        "Směsný komunální odpad: " + directionText(skoDir),
+        "Separace papír+plast+sklo+kov: " + directionText(ppskDir),
+        "Účinnost separace papír+plast+sklo+kov: " + directionText(effDir)
+    ];
+
+    return {
+        state: state,
+        label: wasteStateLabel(state),
+        badgeClass: wasteStateBadgeClass(state),
+        explanation: explanation,
+        evidence: evidence,
+        target: target,
+        sorting2023: sorting2023,
+        sortingGap: sortingGap,
+        ko2023: ko2023,
+        sko2023: sko2023,
+        ppsk2023: ppsk2023,
+        eff2023: eff2023,
+        directions: {
+            ko: koDir,
+            sko: skoDir,
+            ppsk: ppskDir,
+            efficiency: effDir,
+            sorting: sortingDir
+        }
+    };
+}
+
+
+function wasteLegalMilestonesHtml() {
+    return `
+        <div class="waste-reference-grid">
+            <div class="waste-reference-card">
+                <h3>Požadované cíle třídění</h3>
+                <table>
+                    <thead><tr><th>Rok</th><th>Cíl</th></tr></thead>
+                    <tbody>
+                        <tr><td>2025</td><td>60&nbsp;%</td></tr>
+                        <tr><td>2030</td><td>65&nbsp;%</td></tr>
+                        <tr><td>2035</td><td>70&nbsp;%</td></tr>
+                    </tbody>
+                </table>
+                <div class="small-note">
+                    Cíl říká, jaký podíl komunálního odpadu má obec odděleně soustřeďovat.
+                    Poslední oficiální hodnota VISOH2 je v briefingu porovnávána hlavně s milníkem 2025.
+                </div>
+            </div>
+            <div class="waste-reference-card">
+                <h3>Množství odpadu se „slevou“</h3>
+                <table>
+                    <thead><tr><th>Rok</th><th>Limit</th></tr></thead>
+                    <tbody>
+                        <tr><td>2024</td><td>170&nbsp;kg/obyv.</td></tr>
+                        <tr><td>2025</td><td>160&nbsp;kg/obyv.</td></tr>
+                        <tr><td>2026</td><td>150&nbsp;kg/obyv.</td></tr>
+                        <tr><td>2027</td><td>140&nbsp;kg/obyv.</td></tr>
+                        <tr><td>2028</td><td>130&nbsp;kg/obyv.</td></tr>
+                        <tr><td>2029</td><td>120&nbsp;kg/obyv.</td></tr>
+                    </tbody>
+                </table>
+                <div class="small-note">
+                    Limit se vztahuje ke zbytkovému / směsnému odpadu v kg na obyvatele.
+                    Pro aktuální ověření stačí zadat tuny za rok; dashboard dopočítá kg/obyv.
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function wasteReadingLegendHtml() {
+    return `
+        <div class="waste-reading-legend">
+            <h3>Jak číst pohyby v ukazatelích</h3>
+            <p class="waste-reading-intro">
+                Dashboard nehodnotí jeden ukazatel izolovaně. Stejný pohyb může znamenat úsporu odpadu,
+                změnu evidence nebo problém v třídění. Rozhoduje kombinace cíle třídění, komunálního odpadu,
+                směsného odpadu, PPSK a účinnosti separace.
+            </p>
+            <div class="waste-reading-list">
+                <div class="waste-reading-item">
+                    <div class="waste-reading-term">Cíl třídění</div>
+                    <div class="waste-reading-text">
+                        <b>Když plnění cíle roste,</b> obec se přibližuje zákonnému požadavku.
+                        <b>Když klesá nebo je pod cílem,</b> je potřeba zjistit, která část systému brzdí výsledek.
+                    </div>
+                </div>
+                <div class="waste-reading-item">
+                    <div class="waste-reading-term">Černá popelnice</div>
+                    <div class="waste-reading-text">
+                        Směsný / zbytkový odpad je nejpraktičtější provozní signál.
+                        <b>Když klesá,</b> obec má obvykle menší tlak na skládkování a limit se „slevou“.
+                        <b>Když roste,</b> roste provozní a rozpočtové riziko.
+                    </div>
+                </div>
+                <div class="waste-reading-item">
+                    <div class="waste-reading-term">Odpad celkem</div>
+                    <div class="waste-reading-text">
+                        Komunální odpad celkem říká, jestli obec produkuje více nebo méně odpadu.
+                        Sám o sobě ale neříká, zda obec lépe třídí. Může růst kvůli výstavbě,
+                        lepší evidenci nebo většímu využití sběrného dvora.
+                    </div>
+                </div>
+                <div class="waste-reading-item">
+                    <div class="waste-reading-term">Tříděné složky</div>
+                    <div class="waste-reading-text">
+                        Papír, plast, sklo a kovy jsou klíčové složky pro plnění cíle třídění.
+                        <b>Pokles vytříděného množství není automaticky problém.</b>
+                        Je potřeba se podívat, zda zároveň klesá černá popelnice, odpad celkem
+                        a jak se vyvíjí účinnost separace.
+                    </div>
+                </div>
+                <div class="waste-reading-item">
+                    <div class="waste-reading-term">Účinnost</div>
+                    <div class="waste-reading-text">
+                        Účinnost separace říká, jak dobře systém odděluje využitelné složky od zbytku odpadu.
+                        <b>Když roste,</b> systém třídění funguje kvalitněji.
+                        <b>Když klesá,</b> může to znamenat, že využitelné složky častěji končí ve směsném odpadu
+                        nebo že je problém v nastavení sběru.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function wasteAssessmentCoreHtml(props) {
+    const assessment = wasteSystemAssessment(props);
+
+    return `
+        <div class="waste-methodology-box">
+            <span class="waste-state-label ${assessment.badgeClass}">${assessment.label}</span>
+            <div><b>Metodické vyhodnocení odpadů 2021–2023:</b></div>
+            <div style="margin-top:6px;">${assessment.explanation}</div>
+            <ul class="waste-logic-list">
+                ${assessment.evidence.map(function(item) { return "<li>" + item + "</li>"; }).join("")}
+            </ul>
+            <div class="small-note" style="margin-top:10px;">
+                Pravidlo: pokles vytříděného množství papíru, plastu, skla nebo kovů se nehodnotí samostatně. Vždy se čte společně s plněním cíle, komunálním odpadem, směsným odpadem a účinností separace.
+            </div>
+        </div>
+    `;
+}
+
+function wasteAssessmentHtml(props) {
+    return `
+        ${wasteAssessmentCoreHtml(props)}
+        ${wasteLegalMilestonesHtml()}
+        ${wasteReadingLegendHtml()}
+    `;
+}
+
+function wasteMethodologyCardsHtml(props) {
+    const assessment = wasteSystemAssessment(props);
+    const sortingText = assessment.sorting2023 === null ? "bez dat" : formatValue(assessment.sorting2023, 1) + " %";
+    const gapText = assessment.sortingGap === null ? "bez dat" : signedValue(assessment.sortingGap, 1) + " p. b. vůči 60 %";
+    const skoText = assessment.sko2023 === null ? "bez dat" : formatValue(assessment.sko2023, 1) + " kg/obyv.";
+    const effText = assessment.eff2023 === null ? "bez dat" : formatValue(assessment.eff2023, 1) + " %";
+
+    return `
+        <div class="card">
+            <div class="label">Stav systému</div>
+            <div class="value" style="font-size:18px">${assessment.label}</div>
+            <div class="sub">kombinace cíle, KO, SKO, PPSK a účinnosti</div>
+        </div>
+        <div class="card">
+            <div class="label">Plnění cíle třídění 2023</div>
+            <div class="value">${sortingText}</div>
+            <div class="sub">${gapText}</div>
+        </div>
+        <div class="card">
+            <div class="label">Směsný komunální odpad 2023</div>
+            <div class="value">${skoText}</div>
+            <div class="sub">trend: ${directionText(assessment.directions.sko)}</div>
+        </div>
+        <div class="card">
+            <div class="label">Účinnost separace PPSK 2023</div>
+            <div class="value">${effText}</div>
+            <div class="sub">trend: ${directionText(assessment.directions.efficiency)}</div>
+        </div>
+    `;
+}
+
+function numOrNull(value) {
+    if (value === null || value === undefined || value === "" || isNaN(Number(value))) {
+        return null;
+    }
+    return Number(value);
+}
+
+function propNumber(props, key) {
+    return numOrNull(props[key]);
+}
+
+function valueForDiagnostic(props, indicator, year) {
+    return propNumber(props, indicator + "_" + year) ?? propNumber(props, indicator);
+}
+
+function diffForDiagnostic(props, indicator, period) {
+    if (period === "2024_2020") {
+        return (
+            propNumber(props, indicator + "_diff_2024_2020") ??
+            propNumber(props, indicator + "_change_2024_2020") ??
+            propNumber(props, indicator + "_change_24_20")
+        );
+    }
+
+    if (period === "2023_2021") {
+        return (
+            propNumber(props, indicator + "_diff_2023_2021") ??
+            propNumber(props, indicator + "_change_2023_2021")
+        );
+    }
+
+    if (period === "2023_2022") {
+        return (
+            propNumber(props, indicator + "_diff_2023_2022") ??
+            propNumber(props, indicator + "_change_2023_2022")
+        );
+    }
+
+    return null;
+}
+
+function wasteDiffForDiagnostic(props, indicator) {
+    return diffForDiagnostic(props, indicator, "2023_2021");
+}
+
+function diagnostic(level, title, text, evidence) {
+    return {
+        level: level,
+        title: title,
+        text: text,
+        evidence: evidence || []
+    };
+}
+
+function evidenceText(label, valueText) {
+    if (valueText === null || valueText === undefined || valueText === "" || valueText === "bez dat") {
+        return null;
+    }
+
+    return label + ": " + valueText;
+}
+
+function buildCrossDomainDiagnostics(props) {
+    const out = [];
+
+    const populationDiff = diffForDiagnostic(props, "population", "2024_2020");
+    const migration = valueForDiagnostic(props, "migration_balance_per_1000", 2024);
+
+    const childrenShareDiff = diffForDiagnostic(props, "children_share", "2024_2020");
+    const seniorShareDiff = diffForDiagnostic(props, "senior_share", "2024_2020");
+    const ageingIndexDiff = diffForDiagnostic(props, "ageing_index", "2024_2020");
+
+    const unemploymentDiff = diffForDiagnostic(props, "unemployment_rate", "2024_2020");
+
+    const flats = valueForDiagnostic(props, "completed_flats_per_1000", 2024);
+    const flatsDiff = diffForDiagnostic(props, "completed_flats_per_1000", "2024_2020");
+
+    const ecoStability = valueForDiagnostic(props, "ecological_stability_coef", 2024);
+
+    const municipalWasteDiff = wasteDiffForDiagnostic(props, "municipal_waste_kg_per_capita");
+    const mixedWasteDiff = wasteDiffForDiagnostic(props, "mixed_municipal_waste_kg_per_capita");
+    const separatedDiff = wasteDiffForDiagnostic(props, "separated_recyclables_kg_per_capita");
+    const sortingDiff = wasteDiffForDiagnostic(props, "waste_sorting_target_share");
+    const plasticEfficiencyDiff = wasteDiffForDiagnostic(props, "plastic_separation_efficiency");
+    const wasteAssessment = wasteSystemAssessment(props);
+    const ppskDiff = (
+        ppskSeparationValue(props, 2021) !== null && ppskSeparationValue(props, 2023) !== null
+            ? ppskSeparationValue(props, 2023) - ppskSeparationValue(props, 2021)
+            : separatedDiff
+    );
+    const ppskEfficiencyDiff = (
+        ppskEfficiencyValue(props, 2021) !== null && ppskEfficiencyValue(props, 2023) !== null
+            ? ppskEfficiencyValue(props, 2023) - ppskEfficiencyValue(props, 2021)
+            : plasticEfficiencyDiff
+    );
+
+    const density = propNumber(props, "population_density_per_km2");
+    const builtUpShare = propNumber(props, "built_up_area_share");
+    const arableShare = propNumber(props, "arable_land_share");
+    const forestShare = propNumber(props, "forest_land_share");
+    const naturalStableShare = propNumber(props, "natural_stable_area_share");
+    const intensiveLandUseShare = propNumber(props, "intensive_land_use_share");
+    const areaKm2 = propNumber(props, "municipality_area_km2");
+
+    const populationGrowing = populationDiff !== null && populationDiff > 0;
+    const populationDeclining = populationDiff !== null && populationDiff < 0;
+
+    const migrationPositive = migration !== null && migration > 0;
+
+    const childrenGrowing = childrenShareDiff !== null && childrenShareDiff > 0;
+    const seniorsGrowing = seniorShareDiff !== null && seniorShareDiff > 0;
+    const ageingGrowing = ageingIndexDiff !== null && ageingIndexDiff > 0;
+
+    const unemploymentGrowing = unemploymentDiff !== null && unemploymentDiff > 0;
+
+    const flatsGrowing = flatsDiff !== null && flatsDiff > 0;
+    const flatsLow = flats !== null && flats < 1;
+    const flatsActive = flats !== null && flats >= 1;
+
+    if (wasteAssessment.state !== "data_check") {
+        out.push(diagnostic(
+            wasteAssessment.state === "negative" ? "risk" : (wasteAssessment.state === "positive" ? "good" : "warning"),
+            "Metodické vyhodnocení odpadů: " + wasteAssessment.label,
+            wasteAssessment.explanation,
+            wasteAssessment.evidence
+        ));
+    }
+
+    const ecoVeryLow = ecoStability !== null && ecoStability < 0.3;
+    const ecoLow = ecoStability !== null && ecoStability < 1.0;
+
+    const municipalWasteGrowing = municipalWasteDiff !== null && municipalWasteDiff > 0;
+    const municipalWasteDeclining = municipalWasteDiff !== null && municipalWasteDiff < 0;
+
+    const mixedWasteGrowing = mixedWasteDiff !== null && mixedWasteDiff > 0;
+    const mixedWasteDeclining = mixedWasteDiff !== null && mixedWasteDiff < 0;
+
+    const separatedDeclining = ppskDiff !== null && ppskDiff < 0;
+
+    const sortingDeclining = sortingDiff !== null && sortingDiff < 0;
+    const sortingStableOrGrowing = sortingDiff !== null && sortingDiff >= -0.1;
+
+    const plasticEfficiencyDeclining = ppskEfficiencyDiff !== null && ppskEfficiencyDiff < 0;
+
+    const densityHigh = density !== null && density >= 500;
+    const densityLow = density !== null && density < 30;
+    const builtUpHigh = builtUpShare !== null && builtUpShare >= 8;
+    const intensiveHigh = intensiveLandUseShare !== null && intensiveLandUseShare >= 70;
+    const naturalLow = naturalStableShare !== null && naturalStableShare < 20;
+    const forestLow = forestShare !== null && forestShare < 10;
+    const arableHigh = arableShare !== null && arableShare >= 60;
+
+    if (migrationPositive && flatsActive && !populationDeclining && !unemploymentGrowing) {
+        out.push(diagnostic(
+            "good",
+            "Rezidenční atraktivita obce",
+            "Obec má kladné migrační saldo, neklesá dlouhodobě počtem obyvatel a zároveň vykazuje bytovou výstavbu. To naznačuje rezidenční atraktivitu. Doporučeno sledovat kapacity infrastruktury, dopravu, školství a technické služby.",
+            [
+                evidenceText("Migrační saldo / 1000 obyv.", formatValue(migration, 2)),
+                evidenceText("Dokončené byty / 1000 obyv.", formatValue(flats, 2)),
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0))
+            ].filter(Boolean)
+        ));
+    }
+
+    if (migrationPositive && flatsActive && (populationDeclining || unemploymentGrowing)) {
+        out.push(diagnostic(
+            "neutral",
+            "Krátkodobý pozitivní signál migrace a výstavby",
+            "Obec má aktuálně kladné migrační saldo a vykazuje bytovou výstavbu, ale zároveň má dlouhodobý populační pokles nebo zhoršující se nezaměstnanost. Nejde automaticky o stabilní rezidenční atraktivitu, spíše o signál možného obratu.",
+            [
+                evidenceText("Migrační saldo / 1000 obyv.", formatValue(migration, 2)),
+                evidenceText("Dokončené byty / 1000 obyv.", formatValue(flats, 2)),
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna nezaměstnanosti", signedValue(unemploymentDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if ((populationGrowing || migrationPositive) && flatsLow) {
+        out.push(diagnostic(
+            "warning",
+            "Populační tlak při nízké bytové výstavbě",
+            "Obec populačně roste nebo má kladnou migraci, ale aktuální intenzita bytové výstavby je nízká. Může vznikat tlak na dostupnost bydlení nebo na stávající bytový fond.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Migrační saldo / 1000 obyv.", formatValue(migration, 2)),
+                evidenceText("Dokončené byty / 1000 obyv.", formatValue(flats, 2))
+            ].filter(Boolean)
+        ));
+    }
+
+    if (flatsGrowing && populationDeclining) {
+        out.push(diagnostic(
+            "warning",
+            "Výstavba bez zřejmého populačního růstu",
+            "Bytová výstavba roste, ale počet obyvatel dlouhodobě klesá. Doporučeno ověřit, zda jde o rekreační bydlení, výměnu bytového fondu nebo opožděný populační efekt.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna dokončených bytů / 1000 obyv.", signedValue(flatsDiff, 2))
+            ].filter(Boolean)
+        ));
+    }
+
+    if (populationGrowing && municipalWasteGrowing) {
+        out.push(diagnostic(
+            "risk",
+            "Růst obce je doprovázen vyšší produkcí odpadu na obyvatele",
+            "Obec populačně roste a zároveň roste komunální odpad na obyvatele. Nejde tedy jen o efekt větší populace, ale také o vyšší intenzitu produkce odpadu.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna komunálního odpadu / obyv.", signedValue(municipalWasteDiff, 1) + " kg/obyv.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (
+        populationGrowing &&
+        municipalWasteDeclining &&
+        sortingStableOrGrowing &&
+        !separatedDeclining &&
+        !plasticEfficiencyDeclining
+    ) {
+        out.push(diagnostic(
+            "good",
+            "Růst obce bez zhoršení odpadového profilu",
+            "Obec populačně roste, ale komunální odpad na obyvatele klesá a zároveň neklesají hlavní třídicí ukazatele. To je příznivý signál efektivity odpadového systému.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna komunálního odpadu / obyv.", signedValue(municipalWasteDiff, 1) + " kg/obyv."),
+                evidenceText("Změna plnění cíle třídění", signedValue(sortingDiff, 2) + " p. b."),
+                evidenceText("Změna separace PPSK / obyv.", signedValue(ppskDiff, 1) + " kg/obyv."),
+                evidenceText("Změna účinnosti separace PPSK", signedValue(ppskEfficiencyDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (
+        populationGrowing &&
+        municipalWasteDeclining &&
+        sortingStableOrGrowing &&
+        (separatedDeclining || plasticEfficiencyDeclining)
+    ) {
+        out.push(diagnostic(
+            "warning",
+            "Růst obce a pokles odpadu vyžaduje kontrolu třídění",
+            "Obec populačně roste a komunální odpad na obyvatele klesá, ale zároveň klesá některý z třídicích ukazatelů. Pokles odpadu proto nelze automaticky vyhodnotit jako jednoznačné zlepšení.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna komunálního odpadu / obyv.", signedValue(municipalWasteDiff, 1) + " kg/obyv."),
+                evidenceText("Změna plnění cíle třídění", signedValue(sortingDiff, 2) + " p. b."),
+                evidenceText("Změna separace PPSK / obyv.", signedValue(ppskDiff, 1) + " kg/obyv."),
+                evidenceText("Změna účinnosti separace PPSK", signedValue(ppskEfficiencyDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (flatsGrowing && mixedWasteGrowing) {
+        out.push(diagnostic(
+            "risk",
+            "Výstavba může zvyšovat tlak na směsný odpad",
+            "Růst bytové výstavby je doprovázen růstem směsného komunálního odpadu na obyvatele. Doporučeno ověřit zapojení nových domácností do třídění a kapacitu sběrných míst.",
+            [
+                evidenceText("Změna dokončených bytů / 1000 obyv.", signedValue(flatsDiff, 2)),
+                evidenceText("Změna směsného komunálního odpadu / obyv.", signedValue(mixedWasteDiff, 1) + " kg/obyv.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if ((flatsGrowing || flatsActive) && ecoVeryLow) {
+        out.push(diagnostic(
+            "risk",
+            "Rozvoj bydlení v krajině s velmi nízkou ekologickou stabilitou",
+            "Bytová výstavba probíhá v území s velmi nízkou ekologickou stabilitou. Doporučeno důsledně hlídat územní plán, zelenou infrastrukturu, retenční opatření a dopady na krajinu.",
+            [
+                evidenceText("Koeficient ekologické stability", formatValue(ecoStability, 4)),
+                evidenceText("Dokončené byty / 1000 obyv.", formatValue(flats, 2))
+            ].filter(Boolean)
+        ));
+    } else if ((flatsGrowing || flatsActive) && ecoLow) {
+        out.push(diagnostic(
+            "warning",
+            "Rozvoj může vytvářet tlak na krajinu",
+            "Obec vykazuje bytovou výstavbu a zároveň nižší ekologickou stabilitu. Doporučeno sledovat dopady rozvoje na krajinu, vsakování vody, zeleň a nezastavěné plochy.",
+            [
+                evidenceText("Koeficient ekologické stability", formatValue(ecoStability, 4)),
+                evidenceText("Dokončené byty / 1000 obyv.", formatValue(flats, 2))
+            ].filter(Boolean)
+        ));
+    }
+
+    if ((flatsGrowing || flatsActive) && builtUpHigh) {
+        out.push(diagnostic(
+            "warning",
+            "Výstavba v obci s vyšším podílem zastavěných ploch",
+            "Obec vykazuje bytovou výstavbu a zároveň má vyšší podíl zastavěných ploch. Doporučeno hlídat další zábor území, kvalitu veřejných prostranství a kapacity technické infrastruktury.",
+            [
+                evidenceText("Dokončené byty / 1000 obyv.", formatValue(flats, 2)),
+                evidenceText("Podíl zastavěných ploch", formatValue(builtUpShare, 2) + " %")
+            ].filter(Boolean)
+        ));
+    }
+
+    if ((flatsGrowing || flatsActive) && intensiveHigh) {
+        out.push(diagnostic(
+            "warning",
+            "Rozvoj v intenzivně využívaném území",
+            "Výstavba probíhá v území s vysokým podílem orné půdy a zastavěných ploch. Doporučeno zvažovat dopady na vsakování vody, zeleň, retenci a krajinnou prostupnost.",
+            [
+                evidenceText("Intenzivně využívané plochy", formatValue(intensiveLandUseShare, 2) + " %"),
+                evidenceText("Podíl orné půdy", formatValue(arableShare, 2) + " %"),
+                evidenceText("Podíl zastavěných ploch", formatValue(builtUpShare, 2) + " %")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (ecoLow && naturalLow) {
+        out.push(diagnostic(
+            "risk",
+            "Nízká ekologická stabilita a málo přírodně stabilnějších ploch",
+            "Obec má nízkou ekologickou stabilitu a současně nízký podíl lesů, trvalých travních porostů a vodních ploch. Doporučeno prioritně řešit krajinná a retenční opatření.",
+            [
+                evidenceText("Koeficient ekologické stability", formatValue(ecoStability, 4)),
+                evidenceText("Přírodně stabilnější plochy", formatValue(naturalStableShare, 2) + " %")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (arableHigh && forestLow) {
+        out.push(diagnostic(
+            "warning",
+            "Převaha orné půdy při nízkém podílu lesů",
+            "Území obce je výrazně zemědělsky využívané a má nízký podíl lesní půdy. Doporučeno sledovat erozi, retenci vody, větrolamy, remízky a zelenou infrastrukturu.",
+            [
+                evidenceText("Podíl orné půdy", formatValue(arableShare, 2) + " %"),
+                evidenceText("Podíl lesní půdy", formatValue(forestShare, 2) + " %")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (densityHigh) {
+        out.push(diagnostic(
+            "warning",
+            "Vyšší hustota obyvatel a tlak na infrastrukturu",
+            "Obec má vyšší hustotu obyvatel. Doporučeno sledovat kapacity dopravy, parkování, školství, veřejných prostranství, zeleně a technické infrastruktury.",
+            [
+                evidenceText("Hustota obyvatel", formatValue(density, 1) + " obyv./km²"),
+                evidenceText("Výměra obce", formatValue(areaKm2, 2) + " km²")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (densityLow && areaKm2 !== null && areaKm2 >= 10) {
+        out.push(diagnostic(
+            "neutral",
+            "Nízká hustota obyvatel a nákladnost obsluhy území",
+            "Obec má nízkou hustotu obyvatel na relativně rozsáhlém území. To může zvyšovat jednotkové náklady na infrastrukturu, údržbu komunikací, svoz odpadu a dostupnost služeb.",
+            [
+                evidenceText("Hustota obyvatel", formatValue(density, 1) + " obyv./km²"),
+                evidenceText("Výměra obce", formatValue(areaKm2, 2) + " km²")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (populationGrowing && childrenGrowing) {
+        out.push(diagnostic(
+            "warning",
+            "Růst dětské složky populace",
+            "Obec roste a zároveň roste podíl dětí. Doporučeno sledovat kapacity mateřské školy, základní školy, volnočasových aktivit, hřišť a bezpečné dopravy.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna podílu dětí", signedValue(childrenShareDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (seniorsGrowing || ageingGrowing) {
+        out.push(diagnostic(
+            "warning",
+            "Stárnutí populace",
+            "Obec vykazuje známky stárnutí populace. Doporučeno plánovat dostupnost zdravotních a sociálních služeb, bezbariérovost, komunitní péči a dopravní obslužnost.",
+            [
+                evidenceText("Změna podílu seniorů", signedValue(seniorShareDiff, 2) + " p. b."),
+                evidenceText("Změna indexu stáří", signedValue(ageingIndexDiff, 2))
+            ].filter(Boolean)
+        ));
+    }
+
+    if (populationGrowing && seniorsGrowing) {
+        out.push(diagnostic(
+            "warning",
+            "Obec roste, ale zároveň stárne",
+            "Růst obce nemusí znamenat pouze příliv mladých domácností. Vedle školských kapacit je vhodné plánovat také služby pro seniory.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna podílu seniorů", signedValue(seniorShareDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (unemploymentGrowing && populationDeclining) {
+        out.push(diagnostic(
+            "risk",
+            "Riziko sociálně-ekonomického oslabování",
+            "Obec kombinuje populační úbytek a zhoršující se nezaměstnanost. To může signalizovat slabší atraktivitu obce nebo strukturální problém trhu práce.",
+            [
+                evidenceText("Změna počtu obyvatel", signedValue(populationDiff, 0)),
+                evidenceText("Změna nezaměstnanosti", signedValue(unemploymentDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (municipalWasteDeclining && mixedWasteDeclining && sortingStableOrGrowing && !separatedDeclining) {
+        out.push(diagnostic(
+            "good",
+            "Metodicky příznivý vývoj odpadu",
+            "Celkový komunální odpad i směsný komunální odpad klesají a třídění se podle kombinace ukazatelů nezhoršuje. To je příznivý signál, nikoliv izolované hodnocení jednoho čísla.",
+            [
+                evidenceText("Změna komunálního odpadu / obyv.", signedValue(municipalWasteDiff, 1) + " kg/obyv."),
+                evidenceText("Změna směsného komunálního odpadu / obyv.", signedValue(mixedWasteDiff, 1) + " kg/obyv."),
+                evidenceText("Změna plnění cíle třídění", signedValue(sortingDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (municipalWasteDeclining && (separatedDeclining || sortingDeclining || plasticEfficiencyDeclining)) {
+        out.push(diagnostic(
+            "warning",
+            "Pokles odpadu nemusí být jednoznačně pozitivní",
+            "Komunální odpad klesá, ale zároveň se zhoršuje některý z cílových nebo účinnostních ukazatelů. Podle metodiky nejde o čistě pozitivní závěr, ale o smíšený signál k ověření.",
+            [
+                evidenceText("Změna komunálního odpadu / obyv.", signedValue(municipalWasteDiff, 1) + " kg/obyv."),
+                evidenceText("Změna separace PPSK / obyv.", signedValue(ppskDiff, 1) + " kg/obyv."),
+                evidenceText("Změna plnění cíle třídění", signedValue(sortingDiff, 2) + " p. b."),
+                evidenceText("Změna účinnosti separace PPSK", signedValue(ppskEfficiencyDiff, 2) + " p. b.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (municipalWasteGrowing && mixedWasteGrowing) {
+        out.push(diagnostic(
+            "risk",
+            "Roste celkový i směsný komunální odpad",
+            "Současný růst celkového a směsného komunálního odpadu ukazuje na potřebu řešit prevenci vzniku odpadu, třídění a nastavení svozového systému.",
+            [
+                evidenceText("Změna komunálního odpadu / obyv.", signedValue(municipalWasteDiff, 1) + " kg/obyv."),
+                evidenceText("Změna směsného komunálního odpadu / obyv.", signedValue(mixedWasteDiff, 1) + " kg/obyv.")
+            ].filter(Boolean)
+        ));
+    }
+
+    if (out.length === 0) {
+        out.push(diagnostic(
+            "neutral",
+            "Bez jednoznačného mezioblastního signálu",
+            "Z dostupných ukazatelů není patrná silná kombinace rizika ani příležitosti. Doporučeno sledovat jednotlivé oblasti samostatně a postupně doplnit další územní a socioekonomická data.",
+            []
+        ));
+    }
+
+    const priority = {
+        risk: 1,
+        warning: 2,
+        good: 3,
+        neutral: 4
+    };
+
+    out.sort(function(a, b) {
+        return (priority[a.level] || 9) - (priority[b.level] || 9);
+    });
+
+    return out;
+}
+
+function diagnosticBadgeClass(level) {
+    if (level === "good") return "badge-good";
+    if (level === "risk") return "badge-bad";
+    if (level === "warning") return "badge-bad";
+    return "badge-neutral";
+}
+
+function diagnosticLabel(level) {
+    if (level === "good") return "Příznivý signál";
+    if (level === "risk") return "Riziko";
+    if (level === "warning") return "Upozornění";
+    return "Kontext";
+}
+
+function diagnosticKey(item) {
+    if (!item || !item.title) return "";
+    return String(item.title)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\\u0300-\\u036f]/g, "")
+        .replace(/\\s+/g, " ")
+        .trim();
+}
+
+function diagnosticSeverityScore(item) {
+    const levelScore = {
+        risk: 1000,
+        warning: 700,
+        good: 300,
+        neutral: 100
+    };
+
+    let score = levelScore[item.level] || 0;
+
+    const title = item.title || "";
+
+    if (title.includes("sociálně-ekonomického oslabování")) score += 250;
+    if (title.includes("Nízká ekologická stabilita")) score += 220;
+    if (title.includes("Rozvoj bydlení v krajině")) score += 210;
+    if (title.includes("Roste celkový i směsný komunální odpad")) score += 210;
+    if (title.includes("Pokles odpadu nemusí být jednoznačně pozitivní")) score += 190;
+    if (title.includes("Výstavba může zvyšovat tlak na směsný odpad")) score += 180;
+    if (title.includes("Výstavba bez zřejmého populačního růstu")) score += 170;
+    if (title.includes("Populační tlak při nízké bytové výstavbě")) score += 160;
+    if (title.includes("Převaha orné půdy")) score += 140;
+    if (title.includes("Stárnutí populace")) score += 130;
+    if (title.includes("Růst dětské složky populace")) score += 120;
+    if (title.includes("Obec roste, ale zároveň stárne")) score += 110;
+
+    if (item.evidence && item.evidence.length) {
+        score += Math.min(60, item.evidence.length * 15);
+    }
+
+    return score;
+}
+
+function uniqueDiagnostics(items) {
+    const seen = new Set();
+    const out = [];
+
+    items.forEach(function(item) {
+        const key = diagnosticKey(item);
+
+        if (!key || seen.has(key)) return;
+
+        seen.add(key);
+        out.push(item);
+    });
+
+    return out;
+}
+
+function diagnosticAgenda(item) {
+    const title = item && item.title ? item.title : "";
+
+    if (
+        title.includes("odpad") ||
+        title.includes("tříd") ||
+        title.includes("separ") ||
+        title.includes("svoz") ||
+        title.includes("PPSK")
+    ) {
+        return "odpady";
+    }
+
+    if (
+        title.includes("Stárnutí") ||
+        title.includes("stárne") ||
+        title.includes("dětské") ||
+        title.includes("dětí") ||
+        title.includes("senior")
+    ) {
+        return "sluzby";
+    }
+
+    if (
+        title.includes("Výstavba") ||
+        title.includes("výstavby") ||
+        title.includes("Rezidenční") ||
+        title.includes("migrace") ||
+        title.includes("Populační tlak") ||
+        title.includes("hustota obyvatel")
+    ) {
+        return "rozvoj";
+    }
+
+    if (
+        title.includes("krajinu") ||
+        title.includes("krajině") ||
+        title.includes("ekologick") ||
+        title.includes("orné") ||
+        title.includes("lesů") ||
+        title.includes("zastavěných") ||
+        title.includes("intenzivně využívaném území")
+    ) {
+        return "uzemi";
+    }
+
+    if (
+        title.includes("sociálně-ekonomického") ||
+        title.includes("nezaměstnan") ||
+        title.includes("populačního úbytku")
+    ) {
+        return "social";
+    }
+
+    return "ostatni";
+}
+
+function agendaLabel(agenda) {
+    const labels = {
+        odpady: "Odpady a rozpočet",
+        sluzby: "Obyvatelé a služby",
+        rozvoj: "Rozvoj a infrastruktura",
+        uzemi: "Území a krajina",
+        social: "Sociálně-ekonomický vývoj",
+        ostatni: "Další ověření"
+    };
+
+    return labels[agenda] || labels.ostatni;
+}
+
+function hasWasteBriefingData(props) {
+    const fields = [
+        "waste_sorting_target_share",
+        "municipal_waste_kg_per_capita",
+        "mixed_municipal_waste_kg_per_capita",
+        "separated_recyclables_kg_per_capita",
+        "separation_efficiency_ppsk"
+    ];
+
+    return fields.some(function(field) {
+        const value = props[field] !== undefined ? props[field] : props[field + "_2023"];
+        return value !== null && value !== undefined && value !== "" && !isNaN(Number(value));
+    });
+}
+
+function wasteEvidenceFallback(props) {
+    const out = [];
+
+    const sorting = valueForDiagnostic(props, "waste_sorting_target_share", 2023);
+    const mixed = valueForDiagnostic(props, "mixed_municipal_waste_kg_per_capita", 2023);
+    const municipal = valueForDiagnostic(props, "municipal_waste_kg_per_capita", 2023);
+    const ppskEfficiency = valueForDiagnostic(props, "separation_efficiency_ppsk", 2023);
+
+    if (sorting !== null) out.push("Plnění cíle třídění 2023: " + formatValue(sorting, 1) + " %");
+    if (mixed !== null) out.push("Směsný komunální odpad 2023: " + formatValue(mixed, 1) + " kg/obyv.");
+    if (municipal !== null) out.push("Komunální odpad 2023: " + formatValue(municipal, 1) + " kg/obyv.");
+    if (ppskEfficiency !== null) out.push("Účinnost separace PPSK 2023: " + formatValue(ppskEfficiency, 1) + " %");
+
+    return out;
+}
+
+function questionFromDiagnostic(agenda, item, props) {
+    const title = item && item.title ? item.title : "";
+    const evidence = item && item.evidence && item.evidence.length
+        ? item.evidence.slice(0, 4)
+        : [];
+
+    if (agenda === "odpady") {
+        return {
+            agenda: agenda,
+            level: item ? item.level : "warning",
+            question: "Máme aktuální odpadová data za 2024/2025 a víme, zda se obec vejde do limitu zbytkového odpadu?",
+            why: item
+                ? item.text
+                : "Oficiální odpadová data končí rokem 2023. Pro rozhodování po volbách je potřeba ověřit, zda historický stav stále platí a jak obec stojí vůči aktuálním limitům.",
+            verify: "Doplnit směsný / zbytkový komunální odpad v tunách za roky 2024 a 2025. Zkontrolovat plnění cíle třídění, PPSK a účinnost separace; z ručních tun nepočítat účinnost, pokud není oficiálně k dispozici.",
+            askWhom: "svozová firma, obecní úřad, technické služby, ORP / evidence odpadů",
+            evidence: evidence.length ? evidence : wasteEvidenceFallback(props),
+            sourceKeys: item ? [diagnosticKey(item)] : [],
+            score: item ? diagnosticSeverityScore(item) + 500 : 900
+        };
+    }
+
+    if (agenda === "sluzby") {
+        return {
+            agenda: agenda,
+            level: item ? item.level : "warning",
+            question: title.includes("dětské")
+                ? "Musí obec prověřit kapacity školky, školy a služeb pro rodiny?"
+                : "Mění se věková struktura tak, že ovlivní školku, školu nebo služby pro seniory?",
+            why: item ? item.text : "Změna věkové struktury se může rychle propsat do kapacit školky, školy, sociálních služeb, dopravy a bezbariérovosti.",
+            verify: "Porovnat vývoj dětí, seniorů, index stáří a dostupné kapacity služeb. Ověřit, zda plán investic odpovídá změně obyvatel.",
+            askWhom: "ředitel MŠ/ZŠ, sociální komise, ORP, dopravní obslužnost, místostarosta / rada obce",
+            evidence: evidence,
+            sourceKeys: item ? [diagnosticKey(item)] : [],
+            score: item ? diagnosticSeverityScore(item) + 260 : 0
+        };
+    }
+
+    if (agenda === "rozvoj") {
+        return {
+            agenda: agenda,
+            level: item ? item.level : "warning",
+            question: "Odpovídá tempo růstu a výstavby kapacitě infrastruktury a služeb?",
+            why: item ? item.text : "Růst obyvatel nebo výstavby může vytvářet tlak na komunikace, parkování, školství, veřejná prostranství, technickou infrastrukturu i odpadový systém.",
+            verify: "Zkontrolovat nové lokality, územní plán, dokončené a plánované byty, kapacity sítí, dopravy, služeb a dostupnost třídění v nových částech obce.",
+            askWhom: "stavební úřad, projektant územního plánu, odbor rozvoje, správci sítí, technické služby",
+            evidence: evidence,
+            sourceKeys: item ? [diagnosticKey(item)] : [],
+            score: item ? diagnosticSeverityScore(item) + 220 : 0
+        };
+    }
+
+    if (agenda === "uzemi") {
+        return {
+            agenda: agenda,
+            level: item ? item.level : "warning",
+            question: "Nevytváří rozvoj tlak na krajinu, vodu a veřejný prostor?",
+            why: item ? item.text : "Struktura území ovlivňuje vsakování vody, erozi, zeleň, kvalitu veřejného prostoru i nákladnost rozvoje.",
+            verify: "Prověřit rozvojové plochy, hospodaření s dešťovou vodou, retenci, zelenou infrastrukturu, erozní ohrožení a ochranu nezastavěných ploch.",
+            askWhom: "projektant územního plánu, odbor životního prostředí, správce zeleně, vlastníci pozemků, zemědělci",
+            evidence: evidence,
+            sourceKeys: item ? [diagnosticKey(item)] : [],
+            score: item ? diagnosticSeverityScore(item) + 180 : 0
+        };
+    }
+
+    if (agenda === "social") {
+        return {
+            agenda: agenda,
+            level: item ? item.level : "warning",
+            question: "Neoslabuje obec populačně nebo ekonomicky?",
+            why: item ? item.text : "Současný úbytek obyvatel a zhoršení sociálně-ekonomických ukazatelů může snižovat stabilitu obce i příjmovou základnu.",
+            verify: "Prověřit příčiny populačního vývoje, dostupnost práce, dopravní napojení, dostupnost bydlení a lokální bariéry pro domácnosti.",
+            askWhom: "rada obce, ORP, úřad práce, zaměstnavatelé, dopravní koordinátor, komise rozvoje",
+            evidence: evidence,
+            sourceKeys: item ? [diagnosticKey(item)] : [],
+            score: item ? diagnosticSeverityScore(item) + 240 : 0
+        };
+    }
+
+    return {
+        agenda: agenda,
+        level: item ? item.level : "neutral",
+        question: title || "Je zde další datový signál, který má nové vedení ověřit?",
+        why: item ? item.text : "Automatická diagnostika našla doplňkový signál, který je vhodné ověřit v detailu.",
+        verify: "Ověřit signál v detailních datech a porovnat jej s podobně velkými obcemi.",
+        askWhom: "příslušný odborný garant agendy, obecní úřad, rada obce",
+        evidence: evidence,
+        sourceKeys: item ? [diagnosticKey(item)] : [],
+        score: item ? diagnosticSeverityScore(item) : 0
+    };
+}
+
+function buildOnboardingQuestions(props) {
+    const diagnostics = uniqueDiagnostics(buildCrossDomainDiagnostics(props));
+    const grouped = {};
+
+    diagnostics.forEach(function(item) {
+        // Příznivé signály necháváme spíše do detailu. V hlavním briefingu mají být hlavně otázky k ověření.
+        if (item.level === "good") return;
+
+        const agenda = diagnosticAgenda(item);
+        const current = grouped[agenda];
+
+        if (!current || diagnosticSeverityScore(item) > diagnosticSeverityScore(current)) {
+            grouped[agenda] = item;
+        }
+    });
+
+    const questions = [];
+
+    if (grouped.odpady || hasWasteBriefingData(props)) {
+        questions.push(questionFromDiagnostic("odpady", grouped.odpady || null, props));
+    }
+
+    ["sluzby", "rozvoj", "uzemi", "social", "ostatni"].forEach(function(agenda) {
+        if (grouped[agenda]) {
+            questions.push(questionFromDiagnostic(agenda, grouped[agenda], props));
+        }
+    });
+
+    questions.sort(function(a, b) {
+        const agendaPriority = {
+            odpady: 10000,
+            sluzby: 6000,
+            rozvoj: 5000,
+            social: 4500,
+            uzemi: 4000,
+            ostatni: 1000
+        };
+
+        const aScore = (agendaPriority[a.agenda] || 0) + (a.score || 0);
+        const bScore = (agendaPriority[b.agenda] || 0) + (b.score || 0);
+
+        return bScore - aScore;
+    });
+
+    if (questions.length === 0) {
+        questions.push({
+            agenda: "ostatni",
+            level: "neutral",
+            question: "Co má nové vedení ověřit jako první?",
+            why: "V dostupných datech není vidět silný varovný signál. Přesto je vhodné po převzetí obce ověřit aktuálnost klíčových agend a provozních dat.",
+            verify: "Zkontrolovat aktuální rozpočet, smlouvy, investiční plán, odpadová data 2024/2025 a otevřené úkoly rady obce.",
+            askWhom: "starosta / místostarosta, účetní, tajemník nebo administrativní pracovník obce, rada obce",
+            evidence: [],
+            sourceKeys: [],
+            score: 0
+        });
+    }
+
+    return questions.slice(0, 4);
+}
+
+function createMayorPrioritiesPanel(props, slot = "main") {
+    const container = dashboardEl("mayor_priorities", slot);
+    if (!container) return;
+
+    const questions = buildOnboardingQuestions(props);
+
+    let html = `<div class="onboarding-grid">`;
+
+    questions.forEach(function(item, index) {
+        const evidenceHtml = item.evidence && item.evidence.length
+            ? `
+                <div class="onboarding-section">
+                    <span class="onboarding-label">Důkaz v datech</span>
+                    <ul class="onboarding-evidence">
+                        ${item.evidence.slice(0, 4).map(function(e) {
+                            return "<li>" + e + "</li>";
+                        }).join("")}
+                    </ul>
+                </div>
+            `
+            : "";
+
+        html += `
+            <article class="onboarding-card">
+                <div class="onboarding-top">
+                    <span class="onboarding-agenda">${agendaLabel(item.agenda)}</span>
+                    <span class="badge ${diagnosticBadgeClass(item.level)}">${diagnosticLabel(item.level)}</span>
+                </div>
+                <h3 class="onboarding-question">${index + 1}. ${item.question}</h3>
+                <div class="onboarding-section">
+                    <span class="onboarding-label">Proč se ptáme</span>
+                    ${item.why}
+                </div>
+                <div class="onboarding-section">
+                    <span class="onboarding-label">Co ověřit</span>
+                    ${item.verify}
+                </div>
+                <div class="onboarding-section">
+                    <span class="onboarding-label">Koho se zeptat</span>
+                    ${item.askWhom}
+                </div>
+                ${evidenceHtml}
+            </article>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function createCrossDomainDiagnosticsPanel(props, slot = "main") {
+    const container = dashboardEl("cross_domain_diagnostics", slot);
+    if (!container) return;
+
+    const diagnostics = uniqueDiagnostics(buildCrossDomainDiagnostics(props));
+    const questions = buildOnboardingQuestions(props);
+
+    const questionKeys = new Set();
+    questions.forEach(function(question) {
+        (question.sourceKeys || []).forEach(function(key) {
+            questionKeys.add(key);
+        });
+    });
+
+    const remainingDiagnostics = diagnostics.filter(function(item) {
+        return !questionKeys.has(diagnosticKey(item));
+    });
+
+    let html = "";
+
+    if (remainingDiagnostics.length === 0) {
+        html = `
+            <div class="diagnostic-item">
+                <span class="badge badge-neutral">Shrnutí</span>
+                <b>Hlavní signály jsou již uvedeny v prvních otázkách</b>
+                <div class="diagnostic-text">
+                    Automatická diagnostika nenašla další významné souvislosti mimo otázky pro nové vedení.
+                    Detailní interpretaci proto doporučujeme opřít hlavně o otázky výše, trendovou tabulku a surové hodnoty vybrané oblasti.
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+        return;
+    }
+
+    const rows = remainingDiagnostics.slice(0, 8).map(function(item) {
+        const evidenceHtml = item.evidence && item.evidence.length
+            ? `
+                <ul style="margin-top:6px; padding-left:18px;">
+                    ${item.evidence.map(function(e) {
+                        return "<li>" + e + "</li>";
+                    }).join("")}
+                </ul>
+            `
+            : "";
+
+        return `
+            <div class="diagnostic-item">
+                <span class="badge ${diagnosticBadgeClass(item.level)}">
+                    ${diagnosticLabel(item.level)}
+                </span>
+                <b>${item.title}</b>
+                <div class="diagnostic-text">
+                    ${item.text}
+                </div>
+                ${evidenceHtml}
+            </div>
+        `;
+    }).join("");
+
+    html = `
+        <details class="additional-signals-details">
+            <summary>Zobrazit ${remainingDiagnostics.length} dalších signálů z dat</summary>
+            <div style="margin-top:10px;">
+                ${rows}
+            </div>
+        </details>
+    `;
+
+    container.innerHTML = html;
+}
+
+function businessSummaryHtml(props) {
+    if (selectedIndicatorGroupId() === "waste" || isWasteIndicator(selectedIndicatorId())) {
+        return wasteAssessmentHtml(props);
+    }
+
+    const indicator = selectedIndicatorId();
+    const meta = selectedIndicatorMeta();
+    const year = selectedYear();
+
+    const value = getRawIndicatorValue(props);
+    const diffPeriod = getDiffPeriod(props, indicator);
+    const trend = getTrend(props, indicator);
+    const benchmarkText = benchmarkPositionText(props);
+    const benchmarkWarning = benchmarkWarningText(props);
+    const rankInfo = benchmarkRankInfo(props);
+
+    let sourceText = "";
+
+    if (isWasteIndicator(indicator)) {
+        sourceText = "Odpadové ukazatele jsou z VISOH2 a jsou dostupné za období 2021–2023.";
+    } else if (isLandUseIndicator(indicator)) {
+        sourceText = "Ukazatel využití území je stavový údaj z ČSÚ/MOS a ČÚZK, typicky za poslední dostupný rok 2024. Nejde o klasický trendový ukazatel.";
+    } else {
+        sourceText = "Ukazatel je z hlavních obecních dat a je dostupný typicky za období 2020–2024.";
+    }
+
+    const diffText = isLandUseIndicator(indicator)
+        ? "statický / aktuální údaj"
+        : signedValue(diffPeriod, meta.digits ?? 2);
+
+    let text = `
+        Obec <b>${props.obec || "vybraná obec"}</b> je zobrazena podle ukazatele
+        <b>${meta.label}</b>.
+        <br><br>
+        Zobrazená hodnota pro rok <b>${year}</b> nebo poslední dostupný rok je
+        <b>${formatIndicatorValue(value, meta)}</b>.
+        Dlouhodobá změna je <b>${diffText}</b>.
+        Trend je ${trendBadge(trend)}.
+        <br><br>
+        V benchmarku <b>${benchmarkCategory(props) || "neuvedeno"}</b> je obec na pozici:
+        <b>${rankInfo.text}</b>.
+        Kontextově jde o: <b>${benchmarkText}</b>.
+        <br><br>
+        ${sourceText}
+    `;
+
+    if (benchmarkWarning) {
+        text += `
+            <br><br>
+            <span class="badge badge-neutral">Benchmark</span>
+            ${benchmarkWarning}
+        `;
+    }
+
+    if (props.volatility_warning) {
+        text += `
+            <br><br>
+            <span class="badge badge-neutral">Interpretační upozornění</span>
+            ${props.volatility_warning}
+        `;
+    }
+
+    return text;
+}
+
+function createBusinessSummary(props, slot = "main") {
+    const summary = dashboardEl("business_summary", slot);
+    if (summary) summary.innerHTML = businessSummaryHtml(props);
+}
+
+function trendValues(props, indicator) {
+    if (indicatorRequiresPopulation(indicator) && !hasValidPopulation(props)) {
+        return chartYearsForIndicator(indicator).map(function() {
+            return null;
+        });
+    }
+
+    return chartYearsForIndicator(indicator).map(function(year) {
+        const value = props[indicator + "_" + year];
+        if (value === null || value === undefined || isNaN(value)) return null;
+        return Number(value);
+    });
+}
+
+function chartYearsForIndicator(indicator) {
+    if (isWasteIndicator(indicator)) return wasteYears;
+    return allYears;
+}
+
+function latestYearForIndicator(indicator) {
+    if (isWasteIndicator(indicator)) return 2023;
+    return 2024;
+}
+
+function currentValueForIndicator(props, indicator) {
+    return getIndicatorValueForYear(props, indicator, latestYearForIndicator(indicator));
+}
+
+function chartIndicatorsForGroupDashboard(groupId, group) {
+    if (group.trendIndicators && group.trendIndicators.length) {
+        return group.trendIndicators.filter(function(indicator) {
+            return Boolean(indicatorMeta[indicator]);
+        });
+    }
+
+    return group.indicators.filter(function(indicator) {
+        return Boolean(indicatorMeta[indicator]) && !isLandUseIndicator(indicator);
+    });
+}
+
+function summaryIndicatorsForGroupDashboard(groupId, group) {
+    const keyIndicators = {
+        waste: [
+            "waste_sorting_target_share",
+            "municipal_waste_kg_per_capita",
+            "mixed_municipal_waste_kg_per_capita",
+            "bio_waste_kg_per_capita"
+        ],
+        demography: [
+            "population",
+            "migration_balance_per_1000",
+            "senior_share",
+            "ageing_index"
+        ],
+        labour: [
+            "unemployment_rate"
+        ],
+        housing: [
+            "completed_flats_per_1000"
+        ],
+        environment: [
+            "ecological_stability_coef",
+            "natural_stable_area_share",
+            "intensive_land_use_share",
+            "forest_land_share"
+        ]
+    };
+
+    const preferred = keyIndicators[groupId] || group.indicators;
+    return preferred.filter(function(indicator) {
+        return Boolean(indicatorMeta[indicator]);
+    });
+}
+
+function benchmarkScoreForIndicatorYear(props, indicator, year) {
+    const value = getIndicatorValueForYear(props, indicator, year);
+    if (value === null || value === undefined || isNaN(value)) return null;
+
+    const values = benchmarkFeaturesForProperties(props)
+        .map(function(feature) {
+            return getIndicatorValueForYear(feature.properties, indicator, year);
+        })
+        .filter(function(v) {
+            return v !== null && v !== undefined && !isNaN(v);
+        })
+        .sort(function(a, b) {
+            return a - b;
+        });
+
+    if (values.length < 2) return null;
+
+    let lowerCount = 0;
+    let equalCount = 0;
+
+    values.forEach(function(v) {
+        if (v < value - 0.000001) {
+            lowerCount += 1;
+        } else if (Math.abs(v - value) <= 0.000001) {
+            equalCount += 1;
+        }
+    });
+
+    let score = 100 * (lowerCount + Math.max(equalCount - 1, 0) / 2) / (values.length - 1);
+    const meta = indicatorMeta[indicator] || {};
+
+    if (meta.direction === "DOWN") {
+        score = 100 - score;
+    }
+
+    return Math.max(0, Math.min(100, score));
+}
+
+function groupTrendCounts(props, indicators) {
+    const counts = {
+        improving: 0,
+        worsening: 0,
+        neutral: 0,
+        missing: 0
+    };
+
+    indicators.forEach(function(indicator) {
+        const trend = getTrend(props, indicator);
+
+        if (trend === "zlepšení") {
+            counts.improving += 1;
+        } else if (trend === "zhoršení") {
+            counts.worsening += 1;
+        } else if (!trend || trend === "bez dat") {
+            counts.missing += 1;
+        } else {
+            counts.neutral += 1;
+        }
+    });
+
+    return counts;
+}
+
+function groupTrendCountsText(counts) {
+    const parts = [];
+
+    if (counts.improving) parts.push("zlepšení: " + counts.improving);
+    if (counts.worsening) parts.push("zhoršení: " + counts.worsening);
+    if (counts.neutral) parts.push("stabilní nebo kontextový vývoj: " + counts.neutral);
+    if (counts.missing) parts.push("bez dat: " + counts.missing);
+
+    return parts.length ? parts.join(", ") : "bez dostupných trendových dat";
+}
+
+function groupSummaryText(props, groupId, group, chartIndicators) {
+    const counts = groupTrendCounts(props, chartIndicators);
+    const measuredCount = group.indicators.filter(function(indicator) {
+        return Boolean(indicatorMeta[indicator]);
+    }).length;
+
+    let text = `Oblast obsahuje ${measuredCount} ukazatelů. Trendový signál: ${groupTrendCountsText(counts)}.`;
+
+    if (groupId === "environment") {
+        const kes = propNumber(props, "ecological_stability_coef");
+        const kesClass = classifyKES(kes);
+        text += ` Koeficient ekologické stability je ${formatValue(kes, 4)} a odpovídá kategorii ${kesClass.label}.`;
+    } else if (counts.worsening > 0) {
+        text += " Oblast má alespoň jeden varovný trend, který stojí za detailní kontrolu.";
+    } else if (counts.improving > 0) {
+        text += " V oblasti převažuje alespoň jeden pozitivní vývojový signál.";
+    } else {
+        text += " Interpretaci je vhodné opřít hlavně o aktuální hodnoty a benchmark.";
+    }
+
+    return text;
+}
+
+function groupSignalRows(props, groupId, group) {
+    return summaryIndicatorsForGroupDashboard(groupId, group).map(function(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+        const value = currentValueForIndicator(props, indicator);
+        const trend = getTrend(props, indicator);
+
+        return `
+            <div class="group-signal-row">
+                <div>${meta.label || indicator}</div>
+                <div><b>${formatIndicatorValue(value, meta)}</b></div>
+                <div>${trendBadge(trend)}</div>
+            </div>
+        `;
+    }).join("");
+}
+
+function makeBenchmarkPositionChart(canvasId, datasets, yearsForChart, slot = "main") {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+
+    const palette = [
+        "#1b9e77",
+        "#d95f02",
+        "#7570b3",
+        "#e7298a",
+        "#66a61e",
+        "#e6ab02",
+        "#a6761d",
+        "#1f78b4"
+    ];
+
+    charts[canvasId] = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: yearsForChart.map(String),
+            datasets: datasets.map(function(dataset, index) {
+                const color = palette[index % palette.length];
+                return {
+                    label: dataset.label,
+                    data: dataset.values,
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 2,
+                    tension: 0.25,
+                    pointRadius: 3,
+                    spanGaps: true
+                };
+            })
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "bottom",
+                    labels: {
+                        boxWidth: 10,
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            if (value === null || value === undefined || isNaN(value)) {
+                                return context.dataset.label + ": bez dat";
+                            }
+                            return context.dataset.label + ": " + formatValue(value, 0) + " / 100";
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Rok"
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "Pozice v benchmarku"
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    chartSlots[canvasId] = slot;
+}
+
+function destroyCharts(slot = null) {
+    Object.keys(charts).forEach(function(key) {
+        if (charts[key] && (!slot || chartSlots[key] === slot)) {
+            charts[key].destroy();
+            delete charts[key];
+            delete chartSlots[key];
+        }
+    });
+}
+
+function makeLineChart(canvasId, label, values, yearsForChart, meta = {}, slot = "main") {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+
+    const yAxisTitle = meta.unit ? `${label} (${meta.unit})` : label;
+
+    charts[canvasId] = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: yearsForChart.map(String),
+            datasets: [{
+                label: label,
+                data: values,
+                borderWidth: 2,
+                tension: 0.25,
+                pointRadius: 4,
+                spanGaps: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            if (value === null || value === undefined || isNaN(value)) {
+                                return label + ": bez dat";
+                            }
+                            return label + ": " + formatIndicatorValue(value, meta);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Rok"
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: yAxisTitle
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return Number(value).toLocaleString("cs-CZ");
+                        }
+                    }
+                }
+            }
+        }
+    });
+    chartSlots[canvasId] = slot;
+}
+
+function chartIndicatorListForSelectedGroup() {
+    if (selectedIndicatorGroupId() === "environment") {
+        return ["ecological_stability_coef"];
+    }
+
+    return selectedIndicatorGroup().indicators;
+}
+
+function updateCharts(props, slot = "main") {
+    destroyCharts(slot);
+
+    const grid = dashboardEl("charts_grid", slot);
+    if (!grid) return;
+
+    const indicators = chartIndicatorListForSelectedGroup();
+
+    grid.innerHTML = "";
+
+    indicators.forEach(function(indicator, index) {
+        const meta = indicatorMeta[indicator];
+        if (!meta) return;
+
+        const canvasId = dashboardId("chart_dynamic_" + index + "_" + indicator, slot);
+
+        grid.innerHTML += `
+            <div class="chart-card">
+                <h3>${meta.label}</h3>
+                <div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>
+            </div>
+        `;
+    });
+
+    indicators.forEach(function(indicator, index) {
+        const meta = indicatorMeta[indicator];
+        if (!meta) return;
+
+        const canvasId = dashboardId("chart_dynamic_" + index + "_" + indicator, slot);
+        const yearsForChart = chartYearsForIndicator(indicator);
+        const values = trendValues(props, indicator);
+
+        makeLineChart(canvasId, meta.label, values, yearsForChart, meta, slot);
+    });
+}
+
+function updateAllGroupsDashboard(props, slot = "main") {
+    const container = dashboardEl("all_groups_dashboard", slot);
+    if (!container) return;
+
+    const groupIds = Object.keys(indicatorGroups);
+    let html = "";
+
+    groupIds.forEach(function(groupId) {
+        const group = indicatorGroups[groupId];
+        const chartIndicators = chartIndicatorsForGroupDashboard(groupId, group);
+        const canvasId = dashboardId("all_group_chart_" + groupId, slot);
+        const summary = groupSummaryText(props, groupId, group, chartIndicators);
+        const signalRows = groupSignalRows(props, groupId, group);
+
+        html += `
+            <div class="group-dashboard-card">
+                <div class="group-dashboard-top">
+                    <div>
+                        <h3>${group.label}</h3>
+                        <div class="small-note">${group.subtitle}</div>
+                    </div>
+                    <span class="badge">${chartIndicators.length} v grafu</span>
+                </div>
+
+                <div class="group-dashboard-summary">
+                    ${summary}
+                    <div class="group-signal-list">
+                        ${signalRows}
+                    </div>
+                </div>
+
+                <div class="group-chart-wrap">
+                    <canvas id="${canvasId}"></canvas>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    groupIds.forEach(function(groupId) {
+        const group = indicatorGroups[groupId];
+        const chartIndicators = chartIndicatorsForGroupDashboard(groupId, group);
+        const canvasId = dashboardId("all_group_chart_" + groupId, slot);
+
+        if (!chartIndicators.length) return;
+
+        const yearsForChart = groupId === "waste" ? wasteYears : allYears;
+        const datasets = chartIndicators.map(function(indicator) {
+            const meta = indicatorMeta[indicator] || {};
+            return {
+                label: meta.label || indicator,
+                values: yearsForChart.map(function(year) {
+                    return benchmarkScoreForIndicatorYear(props, indicator, year);
+                })
+            };
+        });
+
+        makeBenchmarkPositionChart(canvasId, datasets, yearsForChart, slot);
+    });
+}
+
+function landBar(label, value, digits = 2) {
+    const safeValue = value === null || value === undefined || isNaN(Number(value)) ? null : Number(value);
+    const width = safeValue === null ? 0 : Math.max(0, Math.min(100, safeValue));
+
+    return `
+        <div class="land-bar-row">
+            <div>${label}</div>
+            <div class="land-bar-outer">
+                <div class="land-bar-inner" style="width:${width}%"></div>
+            </div>
+            <div>${safeValue === null ? "bez dat" : formatValue(safeValue, digits) + " %"}</div>
+        </div>
+    `;
+}
+
+function classifyKES(kes) {
+    if (kes === null || kes === undefined || isNaN(Number(kes))) {
+        return {
+            label: "bez dat",
+            shortLabel: "bez dat",
+            level: "data",
+            text: "Pro koeficient ekologické stability nejsou dostupná data.",
+            className: "badge-neutral"
+        };
+    }
+
+    const value = Number(kes);
+
+    if (value < 0.10) {
+        return {
+            label: "velmi narušená krajina",
+            shortLabel: "velmi nízká stabilita",
+            level: "very_low",
+            text: "Hodnota ukazuje velmi nízkou schopnost krajiny tlumit zátěž. Území může být citlivější na erozi, sucho, rychlý odtok vody a přehřívání.",
+            className: "badge-bad"
+        };
+    }
+
+    if (value < 0.50) {
+        return {
+            label: "intenzivně využívané území",
+            shortLabel: "nízká stabilita",
+            level: "low",
+            text: "Území je spíše intenzivně využívané. Nejde samo o sobě o chybu obce, ale je vhodné hlídat vodu v krajině, erozi, zeleň a dopady nové výstavby.",
+            className: "badge-bad"
+        };
+    }
+
+    if (value < 1.00) {
+        return {
+            label: "vyrovnanější krajina",
+            shortLabel: "střední stabilita",
+            level: "medium",
+            text: "Stabilnější a intenzivně využívané plochy jsou blíže rovnováze. Při dalším rozvoji je vhodné chránit zeleň, vodu a nezastavěné plochy.",
+            className: "badge-neutral"
+        };
+    }
+
+    return {
+        label: "stabilnější krajina",
+        shortLabel: "vyšší stabilita",
+        level: "high",
+        text: "Území má příznivější podíl stabilnějších ploch. Pro obec je důležité tuto výhodu udržet při nové výstavbě a investicích.",
+        className: "badge-good"
+    };
+}
+
+function kesInfoboxHtml() {
+    return `
+        <div class="land-summary-box" style="margin-top:14px; background:#fbfdff; border-color:#d8e4f2;">
+            <b>Co je KES?</b><br>
+            Koeficient ekologické stability zjednodušeně říká, jak moc je krajina obce odolná.
+            Porovnává stabilnější plochy, jako jsou lesy, louky a voda, s intenzivně využívanými plochami,
+            jako je orná půda a zastavěné území.
+            <br><br>
+            <b>Důležité pro vedení obce:</b> nízká hodnota neznamená automaticky chybu obce.
+            Je to signál, že při rozhodování o výstavbě, cestách, parkování nebo technické infrastruktuře
+            má obec více hlídat vsakování vody, zeleň, erozi a retenční opatření.
+            <br><br>
+            <table style="font-size:12px; margin-top:6px;">
+                <thead>
+                    <tr><th>Hodnota KES</th><th>Výklad pro obec</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>méně než 0,1</td><td>velmi narušená krajina</td></tr>
+                    <tr><td>0,1–0,5</td><td>intenzivně využívané území</td></tr>
+                    <tr><td>0,5–1,0</td><td>vyrovnanější krajina</td></tr>
+                    <tr><td>více než 1,0</td><td>stabilnější krajina</td></tr>
+                </tbody>
+            </table>
+            <div class="small-note">
+                KES je orientační indikátor. Neříká, že obec něco dělá špatně; ukazuje, jakou má krajina schopnost tlumit zátěž.
+            </div>
+        </div>
+    `;
+}
+
+function kesQuestionsHtml(kesClass) {
+    if (kesClass.level === "data") {
+        return `
+            <ul>
+                <li>Doplnit nebo ověřit údaje o využití území.</li>
+                <li>Při rozvojových rozhodnutích pracovat alespoň s podílem orné půdy, lesů, vodních a zastavěných ploch.</li>
+            </ul>
+        `;
+    }
+
+    if (kesClass.level === "high") {
+        return `
+            <ul>
+                <li>Udržet stabilnější plochy jako výhodu obce.</li>
+                <li>Při nové výstavbě chránit zeleň, vodní prvky a nezastavěné plochy.</li>
+                <li>Ověřit, zda územní plán nenarušuje hlavní stabilizační prvky krajiny.</li>
+            </ul>
+        `;
+    }
+
+    return `
+        <ul>
+            <li>Kde má obec největší problém s odtokem vody po dešti?</li>
+            <li>Jsou v obci erozně ohrožené pozemky?</li>
+            <li>Chrání územní plán dost zeleně, remízků, vodních prvků a nezastavěných ploch?</li>
+            <li>Obsahují nové rozvojové plochy vsakování a retenční opatření?</li>
+        </ul>
+    `;
+}
+
+function kesPracticalBoxHtml(props) {
+    const kes = propNumber(props, "ecological_stability_coef");
+    const kesClass = classifyKES(kes);
+
+    return `
+        <div class="land-summary-box" style="margin-top:14px;">
+            <b>Co znamená KES pro vedení obce:</b><br>
+            <span class="badge ${kesClass.className}">KES: ${kesClass.label}</span>
+            <br><br>
+            ${kesClass.text}
+            <br><br>
+            <b>Co ověřit:</b>
+            ${kesQuestionsHtml(kesClass)}
+        </div>
+    `;
+}
+
+function createLandProfilePanel(props, slot = "main") {
+    const panel = dashboardEl("land_profile_panel", slot);
+    const content = dashboardEl("land_profile_content", slot);
+
+    if (!panel || !content) return;
+
+    if (selectedIndicatorGroupId() !== "environment") {
+        panel.style.display = "none";
+        content.innerHTML = "";
+        return;
+    }
+
+    panel.style.display = "block";
+
+    const area = propNumber(props, "municipality_area_km2");
+    const density = propNumber(props, "population_density_per_km2");
+
+    const built = propNumber(props, "built_up_area_share");
+    const arable = propNumber(props, "arable_land_share");
+    const forest = propNumber(props, "forest_land_share");
+    const grass = propNumber(props, "permanent_grassland_share");
+    const water = propNumber(props, "water_area_share");
+    const agricultural = propNumber(props, "agricultural_land_share");
+    const stable = propNumber(props, "natural_stable_area_share");
+    const intensive = propNumber(props, "intensive_land_use_share");
+    const kes = propNumber(props, "ecological_stability_coef");
+    const kesClass = classifyKES(kes);
+
+    let interpretation = "";
+
+    if (arable !== null && arable >= 60) {
+        interpretation += "Výrazný podíl orné půdy naznačuje potřebu sledovat erozi, retenci vody a krajinnou zeleň. ";
+    }
+
+    if (forest !== null && forest < 10) {
+        interpretation += "Nízký podíl lesní půdy omezuje přirozené stabilizační funkce krajiny. ";
+    }
+
+    if (stable !== null && stable < 20) {
+        interpretation += "Nízký podíl přírodně stabilnějších ploch zvyšuje význam remízků, travních pásů, alejí, mokřadů a dalších retenčních opatření. ";
+    }
+
+    if (intensive !== null && intensive >= 70) {
+        interpretation += "Vysoký podíl intenzivně využívaných ploch může zvyšovat tlak na vsakování vody, mikroklima a krajinnou prostupnost. ";
+    }
+
+    if (!interpretation) {
+        interpretation = "Územní profil nevykazuje extrémní hodnoty podle jednoduchých prahů. Přesto je vhodné sledovat vztah výstavby, zeleně, retence vody a zemědělského využití území.";
+    }
+
+    content.innerHTML = `
+        <div class="land-profile-grid">
+            <div>
+                <div class="cards" style="grid-template-columns: repeat(2, minmax(140px, 1fr)); margin-top:0;">
+                    <div class="card">
+                        <div class="label">Výměra obce</div>
+                        <div class="value">${formatValue(area, 2)} km²</div>
+                        <div class="sub">stavový údaj</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Hustota obyvatel</div>
+                        <div class="value">${formatValue(density, 1)}</div>
+                        <div class="sub">obyv./km²</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Koeficient ekologické stability</div>
+                        <div class="value">${formatValue(kes, 4)}</div>
+                        <div class="sub">${kesClass.shortLabel}</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">Přírodně stabilnější plochy</div>
+                        <div class="value">${formatValue(stable, 2)} %</div>
+                        <div class="sub">lesy + TTP + vodní plochy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="land-profile-bars">
+                ${landBar("Zemědělská půda", agricultural)}
+                ${landBar("Orná půda", arable)}
+                ${landBar("Lesní půda", forest)}
+                ${landBar("Trvalé travní porosty", grass)}
+                ${landBar("Vodní plochy", water)}
+                ${landBar("Zastavěné plochy", built)}
+                ${landBar("Intenzivně využívané plochy", intensive)}
+                ${landBar("Přírodně stabilnější plochy", stable)}
+            </div>
+        </div>
+
+        ${kesPracticalBoxHtml(props)}
+
+        <div class="land-summary-box" style="margin-top:14px;">
+            <b>Další čtení územního profilu:</b><br>
+            ${interpretation}
+        </div>
+
+        ${kesInfoboxHtml()}
+    `;
+}
+
+function dashboardWarningHtml(props) {
+    if (!hasValidPopulation(props)) {
+        return `
+            <div class="warning-box">
+                ⚠ Pro obec nejsou dostupná validní populační data. Ukazatele přepočtené na obyvatele,
+                věková struktura a některé trendy nejsou spolehlivě interpretovatelné.
+            </div>
+        `;
+    }
+
+    if (props.volatility_warning) {
+        return `
+            <div class="warning-box">
+                ⚠ ${props.volatility_warning}
+            </div>
+        `;
+    }
+
+    return "";
+}
+
+function updateDashboardWarning(props, slot = "main") {
+    const warningBox = dashboardEl("dash_warning", slot);
+    if (!warningBox) return;
+
+    warningBox.innerHTML = dashboardWarningHtml(props);
+}
+
+function updateDashboard(props, slot = "main") {
+    ensureDashboardShell(slot);
+
+    const title = dashboardEl("dash_title", slot);
+    const subtitle = dashboardEl("dash_subtitle", slot);
+
+    if (title) {
+        title.innerHTML = "Odpadový briefing: " + (props.obec || "obec");
+    }
+
+    if (subtitle) {
+        subtitle.innerHTML =
+        "Okres: " + (props.okres || "neuvedeno") +
+        " | ORP: " + (props.orp || "") +
+        " | " + settlementBenchmarkText(props);
+    }
+
+    if (isAllGroupsDashboardSelected()) {
+        updateAllGroupsOnlyDashboard(props, slot);
+        return;
+    }
+
+    updateDashboardWarning(props, slot);
+    createIndicatorCards(props, slot);
+    createTrendTable(props, slot);
+    createLandProfilePanel(props, slot);
+    createMayorPrioritiesPanel(props, slot);
+    createCrossDomainDiagnosticsPanel(props, slot);
+    createAgeStructurePanel(props, slot);
+    createRawTable(props, slot);
+    createBusinessSummary(props, slot);
+    updateCharts(props, slot);
+}
+
+function dashboardSection(slot = "main") {
+    return document.getElementById(slot === "compare" ? "dashboard_compare" : "dashboard_main");
+}
+
+function ensureDashboardShell(slot = "main") {
+    const section = dashboardSection(slot);
+    if (!section) return;
+
+    if (section.dataset.dashboardMode !== "single") {
+        section.innerHTML = dashboardShellHtml(slot);
+        section.dataset.dashboardMode = "single";
+    }
+}
+
+function allGroupsDashboardShellHtml(props, slot = "main") {
+    return `
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1 id="${dashboardId("dash_title", slot)}">Dashboard všech ukazatelů: ${props.obec || "obec"}</h1>
+                <p id="${dashboardId("dash_subtitle", slot)}">
+                    Okres: ${props.okres || "neuvedeno"} | ORP: ${props.orp || ""} | ${settlementBenchmarkText(props)}
+                </p>
+                <div id="${dashboardId("dash_warning", slot)}">${dashboardWarningHtml(props)}</div>
+            </div>
+            <div>
+                <span class="badge">všechny oblasti</span>
+                <span class="badge">pozice v benchmarku</span>
+                <span class="badge">trend v čase</span>
+            </div>
+        </div>
+
+        <div class="all-groups-dashboard" style="margin-top:0;">
+            <div class="all-groups-header">
+                <h2>Souhrnný pohled napříč oblastmi</h2>
+                <p>
+                    Grafy ukazují relativní pozici obce v aktuálním benchmarku v čase;
+                    vyšší hodnota znamená příznivější výsledek nebo vyšší kontextovou hodnotu.
+                </p>
+            </div>
+            <div class="all-groups-grid" id="${dashboardId("all_groups_dashboard", slot)}"></div>
+        </div>
+    `;
+}
+
+function updateAllGroupsOnlyDashboard(props, slot = "main") {
+    const section = dashboardSection(slot);
+    if (!section) return;
+
+    destroyCharts(slot);
+    section.innerHTML = allGroupsDashboardShellHtml(props, slot);
+    section.dataset.dashboardMode = "all";
+    updateAllGroupsDashboard(props, slot);
+}
+
+function compareSideHeading(props, isCompare = false) {
+    return `
+        <div class="comparison-side ${isCompare ? "compare" : ""}">
+            <h3>${props.obec || "obec"}</h3>
+            <div class="small-note">
+                Okres: ${props.okres || "neuvedeno"} | ${settlementBenchmarkText(props)}
+            </div>
+            ${dashboardWarningHtml(props)}
+        </div>
+    `;
+}
+
+function comparisonMetricCard(label, mainHtml, compareHtml, mainProps, compareProps, sub = "") {
+    return `
+        <div class="card comparison-metric-card">
+            <div class="label">${label}</div>
+            <div class="comparison-pair compact">
+                <div class="comparison-side">
+                    <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                    <div class="comparison-value">${mainHtml}</div>
+                </div>
+                <div class="comparison-side compare">
+                    <h3>${compareProps.obec || "Porovnávaná obec"}</h3>
+                    <div class="comparison-value">${compareHtml}</div>
+                </div>
+            </div>
+            ${sub ? `<div class="sub">${sub}</div>` : ""}
+        </div>
+    `;
+}
+
+function comparisonCardsHtml(mainProps, compareProps) {
+    const indicator = selectedIndicatorId();
+    const meta = selectedIndicatorMeta();
+    const year = selectedYear();
+
+    const mainValue = getIndicatorValueForYear(mainProps, indicator, year);
+    const compareValue = getIndicatorValueForYear(compareProps, indicator, year);
+    const mainDiff = isLandUseIndicator(indicator)
+        ? "statický / aktuální údaj"
+        : signedValue(getDiffPeriod(mainProps, indicator), meta.digits ?? 2);
+    const compareDiff = isLandUseIndicator(indicator)
+        ? "statický / aktuální údaj"
+        : signedValue(getDiffPeriod(compareProps, indicator), meta.digits ?? 2);
+    const mainRank = benchmarkRankInfo(mainProps);
+    const compareRank = benchmarkRankInfo(compareProps);
+
+    return `
+        <div class="cards">
+            <div class="card">
+                <div class="label">Ukazatel</div>
+                <div class="value" style="font-size:18px">${meta.label}</div>
+                <div class="sub">${meta.description || ""}</div>
+            </div>
+            ${comparisonMetricCard(
+                "Hodnota " + year,
+                formatIndicatorValue(mainValue, meta),
+                formatIndicatorValue(compareValue, meta),
+                mainProps,
+                compareProps,
+                "surová hodnota ve vybraném roce nebo poslední dostupný údaj"
+            )}
+            ${comparisonMetricCard(
+                "Dlouhodobá změna",
+                mainDiff,
+                compareDiff,
+                mainProps,
+                compareProps,
+                "v jednotce ukazatele"
+            )}
+            ${comparisonMetricCard(
+                "Pozice mezi podobnými obcemi",
+                mainRank.text,
+                compareRank.text,
+                mainProps,
+                compareProps,
+                "rok " + year
+            )}
+        </div>
+    `;
+}
+
+function comparisonTrendTableHtml(mainProps, compareProps) {
+    const group = selectedIndicatorGroup();
+    const rowConfig = trendRowsForSelectedGroup();
+
+    let html = `
+        <div style="margin-bottom:8px;">
+            <div style="font-weight:700; font-size:15px;">${group.label}</div>
+            <div class="small-note">${group.subtitle}</div>
+        </div>
+        ${rowConfig.periodNote}
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Ukazatel</th>
+                    <th>${mainProps.obec || "Hlavní obec"}</th>
+                    <th>${compareProps.obec || "Porovnání"}</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    rowConfig.rows.forEach(function(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+        if (!meta) return;
+
+        const mainValue = currentValueForTrendTable(mainProps, indicator);
+        const compareValue = currentValueForTrendTable(compareProps, indicator);
+        const mainDiff = isLandUseIndicator(indicator) ? "—" : signedValue(getDiffPeriod(mainProps, indicator), meta.digits ?? 2);
+        const compareDiff = isLandUseIndicator(indicator) ? "—" : signedValue(getDiffPeriod(compareProps, indicator), meta.digits ?? 2);
+
+        html += `
+            <tr>
+                <td>${meta.label || indicator}</td>
+                <td>
+                    <b>${formatIndicatorValue(mainValue, meta)}</b><br>
+                    <span class="small-note">dlouhodobě: ${mainDiff}</span>
+                </td>
+                <td>
+                    <b>${formatIndicatorValue(compareValue, meta)}</b><br>
+                    <span class="small-note">dlouhodobě: ${compareDiff}</span>
+                </td>
+                <td>
+                    ${trendBadge(getTrend(mainProps, indicator))}
+                    ${trendBadge(getTrend(compareProps, indicator))}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    return html;
+}
+
+function comparisonRawTableHtml(mainProps, compareProps) {
+    const group = selectedIndicatorGroup();
+    let html = `
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Ukazatel</th>
+                    <th>${mainProps.obec || "Hlavní obec"}</th>
+                    <th>${compareProps.obec || "Porovnání"}</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    group.indicators.forEach(function(indicator) {
+        const meta = indicatorMeta[indicator] || {};
+        html += `
+            <tr>
+                <td>${meta.label || indicator}</td>
+                <td>${formatIndicatorValue(rawTableValue(mainProps, indicator), meta)}</td>
+                <td>${formatIndicatorValue(rawTableValue(compareProps, indicator), meta)}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    return html;
+}
+
+function comparisonDiagnosticsHtml(mainProps, compareProps, builder, emptyText = "") {
+    function itemsHtml(props) {
+        const items = builder(props);
+        if (!items.length && emptyText) return `<p>${emptyText}</p>`;
+
+        return items.map(function(item, index) {
+            const title = item.title || "";
+            const text = item.action || item.text || "";
+            const evidence = item.evidence && item.evidence.length
+                ? `
+                    <ul style="margin-top:6px; padding-left:18px;">
+                        ${item.evidence.slice(0, 3).map(function(e) {
+                            return "<li>" + e + "</li>";
+                        }).join("")}
+                    </ul>
+                `
+                : "";
+
+            return `
+                <div class="diagnostic-item">
+                    <span class="badge ${diagnosticBadgeClass(item.level)}">
+                        ${index + 1}. ${diagnosticLabel(item.level)}
+                    </span>
+                    <b>${title}</b>
+                    <div class="diagnostic-text">${text}</div>
+                    ${evidence}
+                </div>
+            `;
+        }).join("");
+    }
+
+    return `
+        <div class="comparison-pair">
+            <div class="comparison-side">
+                <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                ${itemsHtml(mainProps)}
+            </div>
+            <div class="comparison-side compare">
+                <h3>${compareProps.obec || "Porovnání"}</h3>
+                ${itemsHtml(compareProps)}
+            </div>
+        </div>
+    `;
+}
+
+
+function comparisonOnboardingQuestionsHtml(mainProps, compareProps) {
+    function itemsHtml(props) {
+        const questions = buildOnboardingQuestions(props);
+
+        if (!questions.length) {
+            return `<p>V dostupných datech není vidět silný varovný signál. Přesto je vhodné ověřit aktuální rozpočet, smlouvy, investiční plán a provozní data.</p>`;
+        }
+
+        return `
+            <div class="onboarding-grid" style="grid-template-columns:1fr;">
+                ${questions.map(function(item, index) {
+                    const evidenceHtml = item.evidence && item.evidence.length
+                        ? `
+                            <div class="onboarding-section">
+                                <span class="onboarding-label">Důkaz v datech</span>
+                                <ul class="onboarding-evidence">
+                                    ${item.evidence.slice(0, 4).map(function(e) {
+                                        return "<li>" + e + "</li>";
+                                    }).join("")}
+                                </ul>
+                            </div>
+                        `
+                        : "";
+
+                    return `
+                        <article class="onboarding-card">
+                            <div class="onboarding-top">
+                                <span class="onboarding-agenda">${agendaLabel(item.agenda)}</span>
+                                <span class="badge ${diagnosticBadgeClass(item.level)}">${diagnosticLabel(item.level)}</span>
+                            </div>
+                            <h3 class="onboarding-question">${index + 1}. ${item.question}</h3>
+                            <div class="onboarding-section">
+                                <span class="onboarding-label">Proč se ptáme</span>
+                                ${item.why}
+                            </div>
+                            <div class="onboarding-section">
+                                <span class="onboarding-label">Co ověřit</span>
+                                ${item.verify}
+                            </div>
+                            <div class="onboarding-section">
+                                <span class="onboarding-label">Koho se zeptat</span>
+                                ${item.askWhom}
+                            </div>
+                            ${evidenceHtml}
+                        </article>
+                    `;
+                }).join("")}
+            </div>
+        `;
+    }
+
+    return `
+        <div class="comparison-pair">
+            <div class="comparison-side">
+                <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                ${itemsHtml(mainProps)}
+            </div>
+            <div class="comparison-side compare">
+                <h3>${compareProps.obec || "Porovnání"}</h3>
+                ${itemsHtml(compareProps)}
+            </div>
+        </div>
+    `;
+}
+
+function buildAdditionalSignalsForComparison(props) {
+    const diagnostics = uniqueDiagnostics(buildCrossDomainDiagnostics(props));
+    const questions = buildOnboardingQuestions(props);
+    const questionKeys = new Set();
+
+    questions.forEach(function(question) {
+        (question.sourceKeys || []).forEach(function(key) {
+            questionKeys.add(key);
+        });
+    });
+
+    return diagnostics.filter(function(item) {
+        return !questionKeys.has(diagnosticKey(item));
+    }).slice(0, 8);
+}
+
+function comparisonAgeStructureHtml(mainProps, compareProps) {
+    if (selectedIndicatorGroupId() !== "demography") return "";
+
+    function ageRows(props) {
+        if (!hasValidPopulation(props)) {
+            return `<div class="warning-box">Pro obec nejsou dostupná validní populační data.</div>`;
+        }
+
+        return `
+            <table>
+                <tbody>
+                    <tr><td>Děti 0–14</td><td>${formatValue(props.children_share ?? props.children_share_2024, 2)} %</td></tr>
+                    <tr><td>Produktivní věk 15–64</td><td>${formatValue(props.working_age_share ?? props.working_age_share_2024, 2)} %</td></tr>
+                    <tr><td>Senioři 65+</td><td>${formatValue(props.senior_share ?? props.senior_share_2024, 2)} %</td></tr>
+                    <tr><td><b>Index stáří</b></td><td>${formatValue(props.ageing_index ?? props.ageing_index_2024, 2)}</td></tr>
+                </tbody>
+            </table>
+        `;
+    }
+
+    return `
+        <div class="panel" style="margin-top:14px;">
+            <h2>Věková struktura obce</h2>
+            <div class="comparison-pair">
+                <div class="comparison-side">
+                    <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                    ${ageRows(mainProps)}
+                </div>
+                <div class="comparison-side compare">
+                    <h3>${compareProps.obec || "Porovnání"}</h3>
+                    ${ageRows(compareProps)}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function comparisonLandProfileHtml(mainProps, compareProps) {
+    if (selectedIndicatorGroupId() !== "environment") return "";
+
+    function landSummary(props) {
+        const area = propNumber(props, "municipality_area_km2");
+        const density = propNumber(props, "population_density_per_km2");
+        const kes = propNumber(props, "ecological_stability_coef");
+        const stable = propNumber(props, "natural_stable_area_share");
+        const arable = propNumber(props, "arable_land_share");
+        const forest = propNumber(props, "forest_land_share");
+        const intensive = propNumber(props, "intensive_land_use_share");
+        const kesClass = classifyKES(kes);
+
+        const sideSignals = [];
+        if (arable !== null && arable >= 60) sideSignals.push("vysoký podíl orné půdy");
+        if (forest !== null && forest < 10) sideSignals.push("nízký podíl lesů");
+        if (intensive !== null && intensive >= 70) sideSignals.push("vysoký podíl intenzivně využívaných ploch");
+
+        const signalText = sideSignals.length
+            ? sideSignals.join(", ")
+            : "bez výrazného doplňkového signálu podle jednoduchých prahů";
+
+        return `
+            <div class="cards" style="grid-template-columns: repeat(2, minmax(140px, 1fr)); margin-top:0;">
+                <div class="card">
+                    <div class="label">Výměra obce</div>
+                    <div class="value">${formatValue(area, 2)} km²</div>
+                </div>
+                <div class="card">
+                    <div class="label">Hustota obyvatel</div>
+                    <div class="value">${formatValue(density, 1)}</div>
+                    <div class="sub">obyv./km²</div>
+                </div>
+                <div class="card">
+                    <div class="label">Koeficient ekologické stability</div>
+                    <div class="value">${formatValue(kes, 4)}</div>
+                    <div class="sub">${kesClass.shortLabel}</div>
+                </div>
+                <div class="card">
+                    <div class="label">Přírodně stabilnější plochy</div>
+                    <div class="value">${formatValue(stable, 2)} %</div>
+                </div>
+            </div>
+            <div class="land-summary-box" style="margin-top:10px;">
+                <span class="badge ${kesClass.className}">KES: ${kesClass.label}</span>
+                <br><br>
+                ${kesClass.text}
+                <br><br>
+                <b>Doplňkový signál:</b> ${signalText}.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="panel" style="margin-top:14px;">
+            <h2>Profil využití území</h2>
+            <div class="comparison-pair">
+                <div class="comparison-side">
+                    <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                    ${landSummary(mainProps)}
+                </div>
+                <div class="comparison-side compare">
+                    <h3>${compareProps.obec || "Porovnání"}</h3>
+                    ${landSummary(compareProps)}
+                </div>
+            </div>
+            <div class="small-note" style="margin:12px 0 4px 0;">
+                Vysvětlení KES platí pro obě porovnávané obce, proto se zobrazuje pouze jednou.
+            </div>
+            ${kesInfoboxHtml()}
+        </div>
+    `;
+}
+
+function renderComparisonCharts(mainProps, compareProps) {
+    const grid = document.getElementById("comparison_charts_grid");
+    if (!grid) return;
+
+    const indicators = chartIndicatorListForSelectedGroup();
+    grid.innerHTML = "";
+
+    indicators.forEach(function(indicator, index) {
+        const meta = indicatorMeta[indicator];
+        if (!meta) return;
+
+        const mainCanvasId = "comparison_chart_main_" + index + "_" + indicator;
+        const compareCanvasId = "comparison_chart_compare_" + index + "_" + indicator;
+
+        grid.innerHTML += `
+            <div class="chart-card">
+                <h3>${meta.label}</h3>
+                <div class="comparison-chart-pair">
+                    <div class="comparison-chart-side">
+                        <h4>${mainProps.obec || "Hlavní obec"}</h4>
+                        <div class="chart-wrap"><canvas id="${mainCanvasId}"></canvas></div>
+                    </div>
+                    <div class="comparison-chart-side">
+                        <h4>${compareProps.obec || "Porovnání"}</h4>
+                        <div class="chart-wrap"><canvas id="${compareCanvasId}"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    indicators.forEach(function(indicator, index) {
+        const meta = indicatorMeta[indicator];
+        if (!meta) return;
+
+        const yearsForChart = chartYearsForIndicator(indicator);
+        makeLineChart(
+            "comparison_chart_main_" + index + "_" + indicator,
+            meta.label,
+            trendValues(mainProps, indicator),
+            yearsForChart,
+            meta,
+            "comparison"
+        );
+        makeLineChart(
+            "comparison_chart_compare_" + index + "_" + indicator,
+            meta.label,
+            trendValues(compareProps, indicator),
+            yearsForChart,
+            meta,
+            "comparison"
+        );
+    });
+}
+
+function renderComparisonAllGroupsDashboard(mainProps, compareProps) {
+    const container = document.getElementById("comparison_all_groups_dashboard");
+    if (!container) return;
+
+    const groupIds = Object.keys(indicatorGroups);
+    let html = "";
+
+    groupIds.forEach(function(groupId) {
+        const group = indicatorGroups[groupId];
+        const chartIndicators = chartIndicatorsForGroupDashboard(groupId, group);
+        const mainCanvasId = "comparison_all_main_" + groupId;
+        const compareCanvasId = "comparison_all_compare_" + groupId;
+
+        html += `
+            <div class="group-dashboard-card">
+                <div class="group-dashboard-top">
+                    <div>
+                        <h3>${group.label}</h3>
+                        <div class="small-note">${group.subtitle}</div>
+                    </div>
+                    <span class="badge">${chartIndicators.length} v grafu</span>
+                </div>
+                <div class="comparison-pair">
+                    <div class="comparison-side">
+                        <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                        <div class="group-dashboard-summary">
+                            ${groupSummaryText(mainProps, groupId, group, chartIndicators)}
+                            <div class="group-signal-list">${groupSignalRows(mainProps, groupId, group)}</div>
+                        </div>
+                        <div class="group-chart-wrap"><canvas id="${mainCanvasId}"></canvas></div>
+                    </div>
+                    <div class="comparison-side compare">
+                        <h3>${compareProps.obec || "Porovnání"}</h3>
+                        <div class="group-dashboard-summary">
+                            ${groupSummaryText(compareProps, groupId, group, chartIndicators)}
+                            <div class="group-signal-list">${groupSignalRows(compareProps, groupId, group)}</div>
+                        </div>
+                        <div class="group-chart-wrap"><canvas id="${compareCanvasId}"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    groupIds.forEach(function(groupId) {
+        const group = indicatorGroups[groupId];
+        const chartIndicators = chartIndicatorsForGroupDashboard(groupId, group);
+        if (!chartIndicators.length) return;
+
+        const yearsForChart = groupId === "waste" ? wasteYears : allYears;
+
+        function datasetsFor(props) {
+            return chartIndicators.map(function(indicator) {
+                const meta = indicatorMeta[indicator] || {};
+                return {
+                    label: meta.label || indicator,
+                    values: yearsForChart.map(function(year) {
+                        return benchmarkScoreForIndicatorYear(props, indicator, year);
+                    })
+                };
+            });
+        }
+
+        makeBenchmarkPositionChart("comparison_all_main_" + groupId, datasetsFor(mainProps), yearsForChart, "comparison");
+        makeBenchmarkPositionChart("comparison_all_compare_" + groupId, datasetsFor(compareProps), yearsForChart, "comparison");
+    });
+}
+
+function comparisonUsesWasteContext() {
+    return selectedIndicatorGroupId() === "waste" || isWasteIndicator(selectedIndicatorId());
+}
+
+function comparisonBusinessSummaryHtml(props) {
+    if (comparisonUsesWasteContext()) {
+        return wasteAssessmentCoreHtml(props);
+    }
+    return `<p>${businessSummaryHtml(props)}</p>`;
+}
+
+function comparisonSharedWasteContextHtml() {
+    if (!comparisonUsesWasteContext()) return "";
+
+    return `
+        <div class="waste-shared-context" style="margin-top:14px;">
+            <div class="small-note" style="margin-bottom:8px;">
+                Následující cíle, limity a legenda platí pro obě porovnávané obce, proto se při srovnání zobrazují pouze jednou.
+            </div>
+            ${wasteLegalMilestonesHtml()}
+            ${wasteReadingLegendHtml()}
+        </div>
+    `;
+}
+
+function renderComparisonDashboard(mainProps, compareProps) {
+    const section = dashboardSection("main");
+    if (!section) return;
+
+    destroyCharts();
+    setCompareLayoutActive(true, true);
+    section.dataset.dashboardMode = "comparison";
+
+    if (isAllGroupsDashboardSelected()) {
+        section.innerHTML = `
+            <div class="comparison-dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h1>Porovnání všech ukazatelů: ${mainProps.obec || "obec"} × ${compareProps.obec || "obec"}</h1>
+                        <p>${settlementBenchmarkText(mainProps)} | ${settlementBenchmarkText(compareProps)}</p>
+                    </div>
+                    <div>
+                        <span class="badge">všechny oblasti</span>
+                        <span class="badge">pozice v benchmarku</span>
+                    </div>
+                </div>
+                <div class="comparison-pair" style="margin-bottom:14px;">
+                    ${compareSideHeading(mainProps)}
+                    ${compareSideHeading(compareProps, true)}
+                </div>
+                <div class="comparison-all-groups-grid" id="comparison_all_groups_dashboard"></div>
+            </div>
+        `;
+        renderComparisonAllGroupsDashboard(mainProps, compareProps);
+        return;
+    }
+
+    section.innerHTML = `
+        <div class="comparison-dashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">
+                    <h1>Porovnání obcí: ${mainProps.obec || "obec"} × ${compareProps.obec || "obec"}</h1>
+                    <p>Stejné ukazatele jsou spárované vedle sebe pro rychlé porovnání.</p>
+                </div>
+                <div>
+                    <span class="badge">hlavní obec</span>
+                    <span class="badge">porovnávaná obec</span>
+                    <span class="badge">stejná metrika vedle sebe</span>
+                </div>
+            </div>
+
+            <div class="comparison-pair" style="margin-bottom:14px;">
+                ${compareSideHeading(mainProps)}
+                ${compareSideHeading(compareProps, true)}
+            </div>
+
+            ${comparisonCardsHtml(mainProps, compareProps)}
+
+            <div class="grid-2">
+                <div class="panel">
+                    <h2>Metodické vyhodnocení oblasti</h2>
+                    <div class="comparison-pair">
+                        <div class="comparison-side">
+                            <h3>${mainProps.obec || "Hlavní obec"}</h3>
+                            ${comparisonBusinessSummaryHtml(mainProps)}
+                        </div>
+                        <div class="comparison-side compare">
+                            <h3>${compareProps.obec || "Porovnání"}</h3>
+                            ${comparisonBusinessSummaryHtml(compareProps)}
+                        </div>
+                    </div>
+                    ${comparisonSharedWasteContextHtml()}
+                </div>
+                <div class="panel">
+                    <h2>Trendy vybrané oblasti</h2>
+                    ${comparisonTrendTableHtml(mainProps, compareProps)}
+                </div>
+            </div>
+
+            ${comparisonLandProfileHtml(mainProps, compareProps)}
+
+            <div class="panel" style="margin-top:14px;">
+                <h2>První otázky pro nové vedení</h2>
+                <div class="small-note" style="margin-bottom:8px;">
+                    Celkové otázky za obec. Nereagují na aktuálně vybranou oblast v mapě; slouží jako onboardingový briefing po převzetí agendy.
+                </div>
+                ${comparisonOnboardingQuestionsHtml(mainProps, compareProps)}
+            </div>
+
+            <div class="panel" style="margin-top:14px;">
+                <h2>Další signály k ověření</h2>
+                <div class="small-note" style="margin-bottom:8px;">
+                    Doplňkové diagnostické signály, které nejsou zahrnuté v prvních otázkách.
+                </div>
+                ${comparisonDiagnosticsHtml(mainProps, compareProps, buildAdditionalSignalsForComparison, "Hlavní signály jsou již uvedeny v prvních otázkách.")}
+            </div>
+
+            ${comparisonAgeStructureHtml(mainProps, compareProps)}
+
+            <div class="panel" style="margin-top:14px;">
+                <h2>Surové hodnoty vybrané oblasti</h2>
+                ${comparisonRawTableHtml(mainProps, compareProps)}
+            </div>
+
+            <div class="grid-3" id="comparison_charts_grid"></div>
+        </div>
+    `;
+
+    renderComparisonCharts(mainProps, compareProps);
+}
+
+function renderSelectedDashboardState() {
+    if (!selectedMunicipalityLayer) return;
+
+    const mainProps = selectedMunicipalityLayer.feature.properties;
+
+    if (compareMunicipalityLayer) {
+        renderComparisonDashboard(mainProps, compareMunicipalityLayer.feature.properties);
+        return;
+    }
+
+    setCompareLayoutActive(false);
+    updateDashboard(mainProps, "main");
+    destroyCharts("compare");
+    destroyCharts("comparison");
+}
+
+function readUrlState() {
+    const params = new URLSearchParams(window.location.search);
+
+    return {
+        kod_obce: params.get("kod_obce") || "",
+        compare_kod_obce: params.get("compare_kod_obce") || "",
+        year: params.get("year") || params.get("rok") || "",
+        benchmark: params.get("benchmark") || "",
+        indicator_group: params.get("indicator_group") || params.get("oblast") || "",
+        indicator: params.get("indicator") || params.get("ukazatel") || ""
+    };
+}
+
+function groupIdForIndicator(indicator) {
+    return Object.keys(indicatorGroups).find(function(groupId) {
+        return indicatorGroups[groupId].indicators.includes(indicator);
+    }) || null;
+}
+
+function selectHasValue(select, value) {
+    if (!select || value === null || value === undefined || value === "") return false;
+    return Array.from(select.options).some(function(option) {
+        return option.value === value;
+    });
+}
+
+function applyUrlControlState(state) {
+    const groupSelect = document.getElementById("indicator_group");
+    const indicatorSelect = document.getElementById("mode");
+    const yearSelect = document.getElementById("year_select");
+    const sizeSelect = document.getElementById("size_filter");
+
+    let groupId = state.indicator_group;
+
+    if (!validIndicatorGroupId(groupId) && state.indicator) {
+        groupId = groupIdForIndicator(state.indicator);
+    }
+
+    if (!validIndicatorGroupId(groupId)) {
+        groupId = "waste";
+    }
+
+    groupSelect.value = groupId;
+    fillIndicatorSelectForGroup(groupId);
+
+    if (
+        state.indicator &&
+        (
+            groupId === ALL_GROUPS_DASHBOARD_ID ||
+            indicatorGroups[groupId].indicators.includes(state.indicator)
+        ) &&
+        selectHasValue(indicatorSelect, state.indicator)
+    ) {
+        indicatorSelect.value = state.indicator;
+    }
+
+    if (selectHasValue(yearSelect, state.year)) {
+        yearSelect.value = state.year;
+    } else if (groupId === ALL_GROUPS_DASHBOARD_ID) {
+        yearSelect.value = "2024";
+    } else {
+        yearSelect.value = indicatorGroups[groupId].defaultYear || "2024";
+    }
+
+    if (selectHasValue(sizeSelect, state.benchmark)) {
+        sizeSelect.value = state.benchmark;
+    }
+}
+
+function selectMunicipalityByCode(code, slot = "main", updateUrl = false, setBenchmarkFilter = false) {
+    const feature = findMunicipalityFeatureByCode(code);
+
+    if (!feature) {
+        return {
+            ok: false,
+            reason: "Obec s kódem " + code + " není v datech."
+        };
+    }
+
+    const layer = findLayerByFeature(feature);
+
+    if (!layer) {
+        return {
+            ok: false,
+            reason: "Obec s kódem " + code + " je v datech, ale chybí její geometrie."
+        };
+    }
+
+    if (slot === "compare") {
+        const selected = selectCompareLayer(layer, updateUrl, false);
+        return {
+            ok: selected,
+            reason: selected ? "" : "Porovnávací obec musí být jiná než hlavní obec."
+        };
+    }
+
+    selectMunicipalityLayer(layer, setBenchmarkFilter, updateUrl);
+    return {
+        ok: true,
+        reason: ""
+    };
+}
+
+function updateUrlFromState() {
+    if (suppressUrlUpdates) return;
+
+    const params = new URLSearchParams();
+
+    if (selectedMunicipalityLayer) {
+        params.set("kod_obce", selectedMunicipalityLayer.feature.properties.kod_obce || "");
+    }
+
+    if (compareMunicipalityLayer) {
+        params.set("compare_kod_obce", compareMunicipalityLayer.feature.properties.kod_obce || "");
+    }
+
+    const benchmark = document.getElementById("size_filter").value;
+    const groupId = selectedIndicatorGroupId();
+    const indicator = selectedIndicatorId();
+    const year = selectedYear();
+
+    if (benchmark && benchmark !== "ALL") params.set("benchmark", benchmark);
+    if (groupId) params.set("indicator_group", groupId);
+    if (indicator) params.set("indicator", indicator);
+    if (year) params.set("year", year);
+
+    const query = params.toString();
+    const nextUrl = window.location.pathname + (query ? "?" + query : "") + window.location.hash;
+    history.replaceState(null, "", nextUrl);
+}
+
+function selectedMunicipalityFilePart(layer) {
+    if (!layer || !layer.feature) return "obec";
+
+    const props = layer.feature.properties;
+    const name = props.obec || "obec";
+
+    return name
+        .normalize("NFD")
+        .replace(/[\\u0300-\\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .toLowerCase() || "obec";
+}
+
+function reportFilename() {
+    const main = selectedMunicipalityFilePart(selectedMunicipalityLayer);
+
+    if (compareMunicipalityLayer) {
+        return "report_" + main + "_vs_" + selectedMunicipalityFilePart(compareMunicipalityLayer) + ".pdf";
+    }
+
+    return "report_" + main + ".pdf";
+}
+
+function downloadReport() {
+    if (!selectedMunicipalityLayer) {
+        setStatus("Nejprve vyber hlavní obec, potom lze report stáhnout.", true);
+        return;
+    }
+
+    const target = document.getElementById("dashboard_report_area");
+
+    if (!target) {
+        setStatus("Report se nepodařilo připravit, chybí oblast dashboardu.", true);
+        return;
+    }
+
+    if (typeof html2pdf === "undefined") {
+        setStatus("Knihovna pro PDF export není načtená. Otevírám tiskové dialogové okno pro ruční uložení do PDF.", true);
+        window.print();
+        return;
+    }
+
+    const options = {
+        margin: 8,
+        filename: reportFilename(),
+        image: {
+            type: "jpeg",
+            quality: 0.98
+        },
+        html2canvas: {
+            scale: 2,
+            useCORS: true
+        },
+        jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: compareMunicipalityLayer ? "landscape" : "portrait"
+        },
+        pagebreak: {
+            mode: ["css", "legacy"]
+        }
+    };
+
+    setStatus("Připravuji PDF report...");
+    html2pdf().set(options).from(target).save().then(function() {
+        setStatus("Report byl připraven ke stažení.");
+    }).catch(function(error) {
+        console.error(error);
+        setStatus("PDF se nepodařilo vygenerovat. Zkus použít tisk stránky a uložit do PDF.", true);
+    });
+}
+
+function initializeDashboard() {
+    initializeDashboardShells();
+    fillSizeFilter();
+    fillMunicipalitySearch();
+
+    suppressUrlUpdates = true;
+
+    const urlState = readUrlState();
+
+    applyUrlControlState({
+        indicator_group: urlState.indicator_group || "waste",
+        indicator: urlState.indicator || "",
+        year: urlState.year || "2023",
+        benchmark: urlState.benchmark || ""
+    });
+
+    updateLegend();
+
+    document.getElementById("indicator_group").addEventListener("change", function() {
+        const group = indicatorGroups[this.value] || indicatorGroups.waste;
+        fillIndicatorSelectForGroup(this.value);
+        if (this.value === ALL_GROUPS_DASHBOARD_ID) {
+            document.getElementById("year_select").value = "2024";
+        } else {
+            document.getElementById("year_select").value = group.defaultYear || "2024";
+        }
+        updateMap(true);
+        updateUrlFromState();
+    });
+
+    document.getElementById("mode").addEventListener("change", function() {
+        updateMap(true);
+        updateUrlFromState();
+    });
+
+    document.getElementById("size_filter").addEventListener("change", function() {
+        updateMap(true);
+        updateUrlFromState();
+    });
+
+    document.getElementById("year_select").addEventListener("change", function() {
+        updateMap(true);
+        updateUrlFromState();
+    });
+
+    document.getElementById("municipality_search").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            zoomToMunicipality();
+        }
+    });
+
+    const compareInput = document.getElementById("compare_municipality_search");
+    if (compareInput) {
+        compareInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                selectCompareMunicipality();
+            }
+        });
+    }
+
+    const mainCode = urlState.kod_obce || "540480";
+    const mainResult = selectMunicipalityByCode(mainCode, "main", false, !urlState.benchmark);
+
+    if (!mainResult.ok) {
+        setStatus(mainResult.reason + " Načítám výchozí obec.", true);
+        selectMunicipalityByCode("540480", "main", false, true);
+    }
+
+    if (urlState.compare_kod_obce) {
+        const compareResult = selectMunicipalityByCode(urlState.compare_kod_obce, "compare", false, false);
+        if (!compareResult.ok) {
+            setStatus(compareResult.reason + " Porovnání nebylo načteno.", true);
+        }
+    }
+
+    if (compareMunicipalityLayer) {
+        fitComparisonMapIfNeeded();
+    }
+
+    suppressUrlUpdates = false;
+    updateUrlFromState();
+}
+
+initializeDashboard();
+</script>
+</body>
+</html>
+"""
+
+    html = html_template.replace("__GEOJSON_DATA__", geojson_json)
+    html = html.replace("__INDICATOR_META__", indicator_meta_json)
+
+    return html
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+def main() -> None:
+    gdf = prepare_data()
+
+    OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    html = generate_html(gdf)
+    OUTPUT_PATH.write_text(html, encoding="utf-8")
+
+    size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
+
+    print(f"[OK] Interaktivní mapa s rozvojovým dashboardem uložena: {OUTPUT_PATH}")
+    print(f"[INFO] Velikost souboru: {size_mb:.1f} MB")
+
+    if FAST_DEMO_MODE:
+        print(
+            "[INFO] FAST_DEMO_MODE=True: výstup je optimalizovaný pro živou ukázku "
+            f"se zjednodušením geometrie {GEOMETRY_SIMPLIFY_TOLERANCE_METERS} m."
+        )
+    else:
+        print("[INFO] FAST_DEMO_MODE=False: výstup používá plnou geometrii.")
+
+    print("")
+    print("Otevření na macOS:")
+    print(f"open {OUTPUT_PATH}")
+
+
+if __name__ == "__main__":
+    main()
