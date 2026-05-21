@@ -377,7 +377,18 @@ try {
 
     if ($answer -eq "Y" -or $answer -eq "y") {
         if (Test-Path $mapPath) {
-            Start-Process $mapPath
+            if ($IsMacOS) {
+                # Pro Mac pouzije nativni prikaz 'open'
+                Invoke-Expression "open `"$mapPath`""
+            }
+            elseif ($IsLinux) {
+                # Pro Linux pouzije 'xdg-open'
+                Invoke-Expression "xdg-open `"$mapPath`""
+            }
+            else {
+                # Pro Windows zustane puvodni Start-Process
+                Start-Process $mapPath
+            }
         }
         else {
             Write-Host "Map file was not found: $mapPath"
