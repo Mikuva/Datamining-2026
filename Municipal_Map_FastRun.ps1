@@ -5,7 +5,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 # ====================================================================
-# VYNÚTENIE UTF-8 KÓDOVANIA (Oprava pádov na diakritike)
+# VYNUCENÍ UTF-8 KÓDOVÁNÍ (Oprava pádů na diakritice)
 # ====================================================================
 $env:PYTHONIOENCODING = "utf-8"
 $env:PYTHONUTF8 = "1"
@@ -399,7 +399,7 @@ try {
 }
 catch {
     Write-Host ""
-    Write-Host "Sorry, Its fucked up :("
+    Write-Host "Something went wrong, please open file README.md and finish the installation manually"
     Write-Host $_.Exception.Message
     exit 1
 }
